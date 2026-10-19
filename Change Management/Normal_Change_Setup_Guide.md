@@ -554,7 +554,7 @@ var instanceUrl = gs.getProperty('glide.servlet.uri');
 // 1. Query Normal, Standard, Emergency changes in the upcoming 2-week window (today through +14 days)
 var gr = new GlideRecord('change_request');
 gr.addQuery('type', 'IN', 'normal,standard,emergency');
-gr.addQuery('start_date', '>=', gs.beginningOfToday());
+gr.addQuery('start_date', '>=', gs.daysAgoStart(0));
 gr.addQuery('start_date', '<=', gs.daysAgoEnd(-14));
 gr.addQuery('state', 'NOT IN', '3,4,8'); // Exclude Closed (3), Canceled (4/8)
 gr.orderBy('start_date');
