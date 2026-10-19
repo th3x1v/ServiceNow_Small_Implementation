@@ -1,0 +1,35 @@
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
+__pycache__/
+*.pyc
+
+# Local Python scripts
+*.py
+
+# Planning artifacts and scratch files
+implementation_plan.md
+*plan*.md
+*.plan
+scratch/
+
+# IDE and AI assistant rules
+.antigravityrules
+.cursorrules
+.vscode/
+.idea/
+
+# OS metadata
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Explicit planning artifact folders (any depth)
+Planning Artifacts/
+**/Planning Artifacts/
+
+# Windows Python environment binaries
+*.pyd
+pyvenv.cfg
