@@ -161,7 +161,8 @@ Once the supervisor approves in the Assess phase, the change automatically trans
 
 ### 1. Verify / Configure the CAB Decision (Rank 3)
 1. In **Normal Change Policy**, look at **Rank 3** in the Decisions related list:
-   - **Condition**: `Type is Normal` AND `Planned start date between last week and next week`.
+   - **Condition**: **`State is Authorize`** AND `Type is Normal` AND `Planned start date between last week and next week`.
+   *(CRITICAL: You MUST include `State is Authorize` in the condition! Because both the Assess and Authorize flows call this same policy, omitting `State is Authorize` causes Rank 3 to match while still in Assess, prematurely emailing the CAB).*
    - **Answer**: Points to **`CAB Approval`**.
 2. Click into **Rank 3**, and open the **CAB Approval** definition (click the preview icon next to the Approval definition field and select **Open Record**).
 3. On the Approval Definition form:
@@ -192,18 +193,21 @@ Rather than building a flow from scratch, modify the existing out-of-the-box (OO
 * **Branch 1 (`If Approved`)**: Leave the state transition to `Scheduled` (`-2`) as-is. Optionally update the work note to: *"All members of CAB approved asynchronously. Moving to Scheduled."*
 
 ### What to Modify: The `If Rejected` Branch:
-In your flow, the `If Rejected` branch currently contains only an existing **Send Email** action followed by **End Flow**.
 
-Because there is no action forcing the state to `New` or `Assess`, the change already naturally remains in `Authorize`! We just need to flag the change, log the escalation work note, and customize the existing email:
+Out-of-the-box in ServiceNow, a rejection in `Authorize` reverts the state to `New` in one of two places:
 
-1. **Add an "Update Record" action (Insert right above the existing `Send Email`)**:
-   - Click the **`+`** icon directly above the existing `Send Email` action (or between `If Rejected` and `Send Email`).
-   - Choose **Action > ServiceNow Core > Update Record**.
-   - **Record**: Drag the **Change Request** data pill from the data pane.
-   - **Fields to Update**:
-     - **CAB required (`cab_required`)**: Set to **`true`** (Checked).
-     - **Work notes**: Enter:
-       > *"Dissenting vote received during asynchronous review. Change held in Authorize. Escalated to live Teams CAB meeting for review during our regular weekly meeting slot."*
+1. **In Flow Designer (`Change - Normal - Authorize`)**:
+   - Look under the **If Rejected** branch.
+   - If you see an existing **Update Record** action with `State = New`, change `State` to **`Authorize`** (`14`) (or remove the `State` field from the update so the state never leaves Authorize).
+   - In that same **Update Record** step:
+     - Set **`CAB required` (`cab_required`)** = **`true`** (Checked).
+     - Set **`Work notes`** = *"Dissenting vote received during asynchronous review. Change held in Authorize. Escalated to live Teams CAB meeting for review during our regular weekly meeting slot."*
+
+2. **In Change Models (`Change > Administration > Change Models > Normal`)**:
+   - If your flow does not have an Update Record setting `State = New`, the Change Model state engine is doing it automatically!
+   - Open **Normal** Change Model -> **Model State Transitions** related list.
+   - Look for the transition: **From: Authorize -> To: New** (where condition is `Approval is Rejected`).
+   - Open that transition record and uncheck **Active** (`Active = false`) to prevent the engine from automatically bouncing the ticket back to New upon rejection.
 
 2. **Modify the existing "Send Email" action (Immediate Ticket Owner Alert)**:
    - Click to open the existing **Send Email** step.
@@ -356,30 +360,37 @@ Allows the original approver (or the Change Manager/Admin) to overturn a rejecti
 2. Click **New** and configure:
    * **Name**: `Change Vote to Approve`
    * **Table**: `Approval [sysapproval_approver]`
-   * **Action name**: `overturn_cab_vote_approve`
+   * **Action name**: **`overturn_cab_vote_approve`** *(CRITICAL: This must match the 3rd parameter in gsftSubmit exactly, or the server script will not run!)*
    * **Form button**: Checked
-   * **List choice**: Checked *(allows 1-click overturning directly from the Approvers related list on the Change Request)*
-   * **List context menu**: Checked
    * **Client**: Checked
    * **Onclick**: `promptForJustification()`
    * **Condition**:
      ```javascript
-     current.state == 'rejected' && (current.approver == gs.getUserID() || gs.hasRole('change_manager') || gs.hasRole('admin')) && current.sysapproval.state == 14 /* Authorize */
+     current.state == 'rejected' && (current.approver == gs.getUserID() || gs.hasRole('change_manager') || gs.hasRole('admin')) && current.sysapproval.state == 14
      ```
    * **Script**:
      ```javascript
+     // 1. Client-Side Script (prompts user and sets form values)
      function promptForJustification() {
          var reason = prompt("Please enter the justification for overturning this vote (e.g., concerns addressed offline or in CAB):");
          if (!reason || reason.trim() === "") {
              alert("A justification comment is mandatory to change a vote.");
              return false;
          }
+         // Set both comment and state on the form
          g_form.setValue('comments', "VOTE OVERTURNED TO APPROVED: " + reason);
+         g_form.setValue('state', 'approved');
+
+         // Submit the form to trigger server-side execution
          gsftSubmit(null, g_form.getFormElement(), 'overturn_cab_vote_approve');
      }
 
-     // Server-side execution
+     // 2. Server-Side Execution (persists state change to database)
      if (typeof window == 'undefined') {
+         runServerSideCode();
+     }
+
+     function runServerSideCode() {
          current.state = 'approved';
          current.update();
          action.setRedirectURL(current);
@@ -465,6 +476,47 @@ Ensures that whenever an approval changes after being previously decided, an imm
 
 ---
 
+### 2.1 Create Business Rule: Roll Up CAB Approval Consensus
+When an approver changes their vote from Rejected to Approved, ServiceNow does not automatically re-evaluate the parent Change Request. This Business Rule checks if all approvals for the change are now Approved. If 100% consensus is reached, it updates `change_request.approval` to `approved`, which triggers Flow Designer's "Wait for Condition" step to advance the ticket to Scheduled.
+
+1. Navigate to **System Definition > Business Rules**.
+2. Click **New** and configure:
+   - **Name**: `Roll Up CAB Approval Consensus`
+   - **Table**: `Approval [sysapproval_approver]`
+   - **Active**: Checked
+   - **Advanced**: Checked
+   - **When**: `after`
+   - **Update**: Checked
+   - **Filter Conditions**:
+     - `State` `changes to` `Approved`
+     - AND `Approval for` `is not empty`
+3. In the **Advanced** tab, add the script:
+   ```javascript
+   (function executeRule(current, previous /*null when async*/) {
+       // Only process if the parent record is a Change Request in Authorize state
+       var chg = new GlideRecord('change_request');
+       if (!chg.get(current.sysapproval) || chg.state != 14 /* Authorize */) {
+           return;
+       }
+
+       // Check if any approvals for this change are still NOT approved
+       var grApp = new GlideRecord('sysapproval_approver');
+       grApp.addQuery('sysapproval', chg.sys_id);
+       grApp.addQuery('state', '!=', 'approved');
+       grApp.query();
+
+       if (!grApp.hasNext()) {
+           // 100% consensus reached across all approvers
+           // Updating approval to 'approved' wakes up Flow Designer's "Wait for Condition"
+           chg.approval = 'approved';
+           chg.work_notes = "100% CAB consensus reached (final vote approved by " + current.approver.getDisplayValue() + "). Advancing workflow.";
+           chg.update();
+       }
+   })(current, previous);
+   ```
+
+---
+
 ### 3. Flow Designer: Resume Flow Upon Overturned Vote
 In your Authorize Flow (`Change - Normal - Authorize`):
 
@@ -477,6 +529,9 @@ In your Authorize Flow (`Change - Normal - Authorize`):
    - **Update Record (`change_request`)**:
      - `State` -> `Scheduled` (Value `-2`)
      - `Work Notes` = *"All CAB approvals obtained (including in-meeting vote updates). Advancing to Scheduled."*
+
+> [!NOTE]
+> Flow Designer's "Wait for Condition" action listens for database updates on the `change_request` table. Because approvers cast votes on child `sysapproval_approver` records, the Business Rule above bridges the two: when the last vote turns to Approved, it updates `change_request.approval = 'approved'`, instantly resuming the flow.
 
 ---
 
