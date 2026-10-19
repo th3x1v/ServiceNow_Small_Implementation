@@ -549,7 +549,10 @@ It automatically aggregates **Normal**, **Standard**, and **Emergency** changes 
 Paste this complete script into the **Body `fx`** editor. It executes the query for all upcoming changes across all three types over the next 14 days, builds the HTML 7-column calendar grid and the itemized record table, and generates direct ticket links:
 
 ```javascript
-var instanceUrl = gs.getProperty('glide.servlet.uri');
+var instanceUrl = gs.getProperty('glide.servlet.uri') || '';
+if (instanceUrl && !instanceUrl.endsWith('/')) {
+    instanceUrl += '/';
+}
 
 // 1. Query Normal, Standard, Emergency changes in the upcoming 2-week window (today through +14 days)
 var gr = new GlideRecord('change_request');
@@ -569,25 +572,35 @@ var allChanges = [];
 
 while (gr.next()) {
     totalCount++;
-    var type = gr.getValue('type') || 'normal';
-    if (type == 'normal') normalCount++;
-    else if (type == 'standard') standardCount++;
-    else if (type == 'emergency') emergCount++;
+    var rawType = gr.getValue('type') || 'normal';
+    var chgType = String(rawType).toLowerCase();
+    if (chgType == 'normal') normalCount++;
+    else if (chgType == 'standard') standardCount++;
+    else if (chgType == 'emergency') emergCount++;
 
-    var startDateRaw = gr.getValue('start_date') || '';
-    var dateKey = startDateRaw ? startDateRaw.split(' ')[0] : 'Unscheduled';
-    var timeKey = startDateRaw ? startDateRaw.split(' ')[1].substring(0, 5) : '';
+    // Safe extraction of date and time using GlideDateTime
+    var dateKey = 'Unscheduled';
+    var timeKey = '';
+    var startDisp = gr.getDisplayValue('start_date') || '';
+    var endDisp = gr.getDisplayValue('end_date') || '';
+
+    var rawStart = gr.getValue('start_date');
+    if (rawStart) {
+        var gdtItem = new GlideDateTime(rawStart);
+        dateKey = String(gdtItem.getLocalDate().getValue());
+        timeKey = String(gdtItem.getLocalTime().getByFormat('HH:mm')) || '';
+    }
 
     var chgObj = {
-        sysId: gr.getUniqueValue(),
-        number: gr.getValue('number'),
-        type: type,
-        shortDesc: gr.getValue('short_description') || 'No description',
-        assignedTo: gr.assigned_to.getDisplayValue() || 'Unassigned',
-        risk: gr.risk.getDisplayValue() || 'Moderate',
-        state: gr.state.getDisplayValue() || '',
-        startDate: startDateRaw,
-        endDate: gr.getValue('end_date') || '',
+        sysId: String(gr.getUniqueValue() || ''),
+        number: String(gr.getValue('number') || 'Change'),
+        type: chgType,
+        shortDesc: String(gr.getValue('short_description') || 'No description'),
+        assignedTo: String(gr.assigned_to.getDisplayValue() || 'Unassigned'),
+        risk: String(gr.risk.getDisplayValue() || 'Moderate'),
+        state: String(gr.state.getDisplayValue() || ''),
+        startDate: startDisp,
+        endDate: endDisp,
         dateKey: dateKey,
         timeKey: timeKey
     };
@@ -609,11 +622,12 @@ html += "<hr/>";
 html += "<p><b>2-Week Implementation Calendar Grid</b></p>";
 
 var gdtToday = new GlideDateTime();
-var todayDateStr = gdtToday.getDate().getValue(); // "YYYY-MM-DD"
+var todayDateStr = String(gdtToday.getLocalDate().getValue());
 var dayOfWeek = gdtToday.getDayOfWeekLocalTime(); // 1 = Mon, 7 = Sun
 
 // Start calendar on Monday of the current week
-var gdtCal = new GlideDateTime(gdtToday);
+var gdtCal = new GlideDateTime();
+gdtCal.setValue(gdtToday.getValue());
 gdtCal.addDaysLocalTime(-(dayOfWeek - 1));
 
 // Calculate number of weeks needed to cover from this Monday through 14 days from today
@@ -637,7 +651,7 @@ html += "<tbody>";
 for (var w = 0; w < totalWeeks; w++) {
     html += "<tr>";
     for (var d = 0; d < 7; d++) {
-        var dStr = gdtCal.getDate().getValue();
+        var dStr = String(gdtCal.getLocalDate().getValue());
         var monthDay = dStr.substring(5, 7) + "/" + dStr.substring(8, 10);
         var isToday = (dStr == todayDateStr);
 
@@ -648,10 +662,14 @@ for (var w = 0; w < totalWeeks; w++) {
             var dayList = changesByDate[dStr];
             for (var k = 0; k < dayList.length; k++) {
                 var c = dayList[k];
-                var cLink = instanceUrl + "nav_to.do?uri=change_request.do?sys_id=" + c.sysId;
-                var shortSnippet = c.shortDesc.length > 25 ? (c.shortDesc.substring(0, 22) + "...") : c.shortDesc;
-                html += "<br/><a href='" + cLink + "'><b>" + c.number + "</b></a> [" + c.type.toUpperCase() + "]";
-                html += "<br/><small>" + (c.timeKey ? c.timeKey + " " : "") + shortSnippet + "</small>";
+                if (!c) continue;
+                var cNum = c.number || 'Change';
+                var cType = String(c.type || 'normal').toUpperCase();
+                var cLink = instanceUrl + "nav_to.do?uri=change_request.do?sys_id=" + (c.sysId || '');
+                var snippet = (c.shortDesc && c.shortDesc.length > 25) ? (c.shortDesc.substring(0, 22) + "...") : (c.shortDesc || '');
+
+                html += "<br/><a href='" + cLink + "'><b>" + cNum + "</b></a> [" + cType + "]";
+                html += "<br/><small>" + (c.timeKey ? c.timeKey + " " : "") + snippet + "</small>";
             }
         }
         html += "</td>";
@@ -686,7 +704,7 @@ if (allChanges.length == 0) {
 } else {
     for (var j = 0; j < allChanges.length; j++) {
         var item = allChanges[j];
-        var tLink = instanceUrl + "nav_to.do?uri=change_request.do?sys_id=" + item.sysId;
+        var tLink = instanceUrl + "nav_to.do?uri=change_request.do?sys_id=" + (item.sysId || '');
 
         html += "<tr>";
         html += "<td><a href='" + tLink + "'><b>" + item.number + "</b></a></td>";
