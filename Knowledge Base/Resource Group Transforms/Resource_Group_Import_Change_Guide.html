@@ -1,0 +1,583 @@
+<!-- 
+  ServiceNow Knowledge Base Article: KB - Resource Group Import Change Guide
+  Category: Resource Group Transforms
+  Instructions:
+  1. Open ServiceNow -> Knowledge -> Articles -> Create New (or open kb_knowledge form).
+  2. In the "Article Body" (text field) TinyMCE toolbar, click the Source Code icon (<>).
+  3. Paste this entire HTML block into the source window and click OK.
+  4. Fill in Short Description: "KB - Resource Group Import Change Guide"
+  5. Select Knowledge Base and Category: "Resource Group Transforms"
+  6. Click Save or Publish.
+-->
+<div class="sn-kb-article" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 14px; line-height: 1.6; color: black; max-width: 100%;">
+  
+  <!-- KB Metadata Header Callout -->
+  <div class="alert alert-info" style="padding: 12px 16px; margin-bottom: 20px; border: 1px solid lightgray; border-left: 5px solid darkblue; border-radius: 4px; background-color: aliceblue; font-size: 13px;">
+    <div style="font-weight: bold; font-size: 15px; margin-bottom: 4px; color: darkblue;">Knowledge Base Article Details</div>
+    <div><strong>Title:</strong> KB - Resource Group Import Change Guide</div>
+    <div><strong>Category:</strong> Resource Group Transforms</div>
+    <div><strong>Audience:</strong> ServiceNow Administrators, Change Managers, IT Operations</div>
+  </div>
+
+  <!-- Article Body Content -->
+<h1 style="font-size: 22px; font-weight: bold; border-bottom: 2px solid lightgray; padding-bottom: 8px; margin-top: 16px; margin-bottom: 16px; color: black;">
+ Resource Group Import  -  Migration to Delta Updates
+</h1>
+<p>
+ This guide provides a direct checklist of the exact changes you need to make in your ServiceNow instance to switch from the old blanket pre-cleanup process to the
+ <strong>
+  delta-based process
+ </strong>
+ .
+</p>
+<hr style="border: 0; border-top: 1px solid lightgray; margin: 24px 0;"/>
+<h2 style="font-size: 18px; font-weight: bold; border-bottom: 1px solid lightgray; padding-bottom: 6px; margin-top: 24px; margin-bottom: 12px; color: black;">
+ Executive Summary: What is Changing?
+</h2>
+<table class="table table-bordered table-striped" style="width: 100%; border-collapse: collapse; margin: 16px 0; border: 1px solid lightgray; font-size: 13px;">
+ <thead>
+  <tr>
+   <th style="background-color: whitesmoke; border: 1px solid lightgray; padding: 8px 10px; text-align: left; font-weight: bold; color: black;">
+    Component
+   </th>
+   <th style="background-color: whitesmoke; border: 1px solid lightgray; padding: 8px 10px; text-align: left; font-weight: bold; color: black;">
+    Old Behavior
+   </th>
+   <th style="background-color: whitesmoke; border: 1px solid lightgray; padding: 8px 10px; text-align: left; font-weight: bold; color: black;">
+    New Behavior
+   </th>
+   <th style="background-color: whitesmoke; border: 1px solid lightgray; padding: 8px 10px; text-align: left; font-weight: bold; color: black;">
+    Action Needed
+   </th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Cleanup Flow
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    Deleted ALL users from all
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     pps_resource
+    </code>
+    groups every month
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Retired.
+    </strong>
+    Group memberships are no longer wiped.
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Deactivate
+    </strong>
+    the Flow in Flow Designer
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Transform Map #3
+    </strong>
+    (
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     sys_user_grmember
+    </code>
+    )
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    Re-inserted all users after the wipe
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    Unchanged users are left untouched (history preserved); transferring users have old team removed and new team added
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Add 1
+     <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+      onBefore
+     </code>
+     Transform Script
+    </strong>
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Scheduled Import
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    "Run Transform" unchecked (waited on flow)
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    "Run Transform"
+    <strong>
+     checked
+    </strong>
+    (runs directly upon load)
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Check 1 box
+    </strong>
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Transform Maps #1, #2, #2.5, #4
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    Unchanged
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    Unchanged
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     No changes needed
+    </strong>
+   </td>
+  </tr>
+ </tbody>
+</table>
+<hr style="border: 0; border-top: 1px solid lightgray; margin: 24px 0;"/>
+<h2 style="font-size: 18px; font-weight: bold; border-bottom: 1px solid lightgray; padding-bottom: 6px; margin-top: 24px; margin-bottom: 12px; color: black;">
+ Step 1: Deactivate the Pre-Cleanup Flow
+</h2>
+<p>
+ Stop the system from mass-deleting group memberships before imports:
+</p>
+<ol style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+ <li style="margin-bottom: 4px;">
+  Navigate to
+  <strong>
+   Process Automation → Flow Designer
+  </strong>
+  .
+ </li>
+ <li style="margin-bottom: 4px;">
+  Search for and open
+  <strong>
+   <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+    RG Import - Pre-Cleanup
+   </code>
+  </strong>
+  .
+ </li>
+ <li style="margin-bottom: 4px;">
+  In the upper right corner, click
+  <strong>
+   Deactivate
+  </strong>
+  .
+ </li>
+ <li style="margin-bottom: 4px;">
+  Confirm deactivation when prompted.
+ </li>
+</ol>
+<div class="alert alert-info" style="padding: 12px 16px; margin: 16px 0; border: 1px solid lightgray; border-left: 5px solid darkblue; border-radius: 4px; background-color: aliceblue; font-size: 13px;">
+ <strong style="color: darkblue;">
+  Note:
+ </strong>
+ <p>
+  If you previously used the manual Fix Script instead of the Flow, simply do
+  <strong>
+   not
+  </strong>
+  run the Fix Script before your next import.
+ </p>
+</div>
+<hr style="border: 0; border-top: 1px solid lightgray; margin: 24px 0;"/>
+<h2 style="font-size: 18px; font-weight: bold; border-bottom: 1px solid lightgray; padding-bottom: 6px; margin-top: 24px; margin-bottom: 12px; color: black;">
+ Step 2: Add the Delta Script to Transform Map #3
+</h2>
+<p>
+ This script checks
+ <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+  sn_employee_profile
+ </code>
+ . If an employee moved to a new capacity team, it removes their old team membership before adding the new one. If they did not move, it leaves them untouched.
+</p>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ 2.1  -  Verify Coalesce Settings
+</h3>
+<ol style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+ <li style="margin-bottom: 4px;">
+  Navigate to
+  <strong>
+   System Import Sets → Transform Maps
+  </strong>
+  .
+ </li>
+ <li style="margin-bottom: 4px;">
+  Open
+  <strong>
+   <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+    RG Import - 3 - Create Memberships
+   </code>
+  </strong>
+  .
+ </li>
+ <li style="margin-bottom: 4px;">
+  Scroll to the
+  <strong>
+   Field Maps
+  </strong>
+  related list at the bottom and confirm:
+ </li>
+ <li style="margin-bottom: 4px;">
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   u_sam_account_name
+  </code>
+  →
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   user
+  </code>
+  has
+  <strong>
+   Coalesce = true
+  </strong>
+ </li>
+ <li style="margin-bottom: 4px;">
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   u_capacity_planning
+  </code>
+  →
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   group
+  </code>
+  has
+  <strong>
+   Coalesce = true
+  </strong>
+ </li>
+</ol>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ 2.2  -  Add the onBefore Script
+</h3>
+<ol style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+ <li style="margin-bottom: 4px;">
+  On the same Transform Map record, scroll down to the
+  <strong>
+   Transform Scripts
+  </strong>
+  related list.
+ </li>
+ <li style="margin-bottom: 4px;">
+  Click
+  <strong>
+   New
+  </strong>
+  .
+ </li>
+ <li style="margin-bottom: 4px;">
+  Fill in:
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   When:
+  </strong>
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   onBefore
+  </code>
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Active:
+  </strong>
+  Checked
+ </li>
+ <li style="margin-bottom: 4px;">
+  In the
+  <strong>
+   Script
+  </strong>
+  box, paste the following:
+ </li>
+</ol>
+<pre style="background-color: whitesmoke; border: 1px solid lightgray; border-radius: 4px; padding: 12px; overflow-x: auto; font-family: Consolas, Monaco, monospace; font-size: 13px; line-height: 1.45; margin: 14px 0;"><code class="language-javascript" style="font-family: Consolas, Monaco, monospace; color: black; background: transparent; padding: 0;">(function runTransformScript(source, map, log, target /*undefined onStart*/ ) {
+    var sam = (source.u_sam_account_name || '').toString().trim();
+    var newGroupName = (source.u_capacity_planning || '').toString().trim();
+
+    if (!sam || !newGroupName) {
+        return;
+    }
+
+    // Look up the user's current team from their Employee Profile
+    var prof = new GlideRecord('sn_employee_profile');
+    prof.addQuery('user.u_samaccountname', sam);
+    prof.query();
+
+    if (prof.next()) {
+        var oldGroup = prof.getValue('primary_resource_group');
+        var oldGroupName = prof.primary_resource_group.getDisplayValue();
+
+        // If they have an existing team and it differs from the incoming CSV team, remove the old membership
+        if (oldGroup &amp;&amp; oldGroupName != newGroupName) {
+            var oldMem = new GlideRecord('sys_user_grmember');
+            oldMem.addQuery('user', prof.getValue('user'));
+            oldMem.addQuery('group', oldGroup);
+            oldMem.deleteMultiple();
+            log.info('RG Import #3: Transferred user ' + sam + ' from old group ' + oldGroupName + ' to ' + newGroupName);
+        }
+    }
+})(source, map, log, target);
+</code></pre>
+<ol style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+ <li style="margin-bottom: 4px;">
+  Click
+  <strong>
+   Submit
+  </strong>
+  .
+ </li>
+</ol>
+<hr style="border: 0; border-top: 1px solid lightgray; margin: 24px 0;"/>
+<h2 style="font-size: 18px; font-weight: bold; border-bottom: 1px solid lightgray; padding-bottom: 6px; margin-top: 24px; margin-bottom: 12px; color: black;">
+ Step 3: Update the Scheduled Import
+</h2>
+<p>
+ Because you no longer need to wait for a cleanup flow to run, the Scheduled Import can execute the transform immediately:
+</p>
+<ol style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+ <li style="margin-bottom: 4px;">
+  Navigate to
+  <strong>
+   System Import Sets → Administration → Scheduled Imports
+  </strong>
+  .
+ </li>
+ <li style="margin-bottom: 4px;">
+  Open
+  <strong>
+   <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+    Monthly Resource Group Import
+   </code>
+  </strong>
+  .
+ </li>
+ <li style="margin-bottom: 4px;">
+  Check the
+  <strong>
+   Run Transform
+  </strong>
+  checkbox (
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   true
+  </code>
+  ).
+ </li>
+ <li style="margin-bottom: 4px;">
+  Click
+  <strong>
+   Update
+  </strong>
+  /
+  <strong>
+   Save
+  </strong>
+  .
+ </li>
+</ol>
+<hr style="border: 0; border-top: 1px solid lightgray; margin: 24px 0;"/>
+<h2 style="font-size: 18px; font-weight: bold; border-bottom: 1px solid lightgray; padding-bottom: 6px; margin-top: 24px; margin-bottom: 12px; color: black;">
+ Step 4: Verification / Testing (Optional but Recommended)
+</h2>
+<p>
+ Before running your full monthly production file, you can verify the behavior with a small 3-row test CSV:
+</p>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ Test Data Example
+</h3>
+<pre style="background-color: whitesmoke; border: 1px solid lightgray; border-radius: 4px; padding: 12px; overflow-x: auto; font-family: Consolas, Monaco, monospace; font-size: 13px; line-height: 1.45; margin: 14px 0;"><code class="language-csv" style="font-family: Consolas, Monaco, monospace; color: black; background: transparent; padding: 0;">SAM Account Name,Capacity Team,Role,Schedule,FTE Hours
+jsmith,Network Operations,pps_resource,8-5 weekdays,8
+bwhite,Cloud Infrastructure,pps_resource,8-5 weekdays,8
+newuser,Security Response,pps_resource,8-5 weekdays,8
+</code></pre>
+<ul style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+ <li style="margin-bottom: 4px;">
+  <strong>
+   <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+    jsmith
+   </code>
+   (Unchanged):
+  </strong>
+  Already in "Network Operations" in ServiceNow.
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+    bwhite
+   </code>
+   (Transfer):
+  </strong>
+  Currently in "Network Operations" in ServiceNow, moving to "Cloud Infrastructure".
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+    newuser
+   </code>
+   (New):
+  </strong>
+  Has no current group.
+ </li>
+</ul>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ Expected Results After Transform:
+</h3>
+<ol style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Unchanged User (
+   <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+    jsmith
+   </code>
+   ):
+  </strong>
+ </li>
+ <li style="margin-bottom: 4px;">
+  Check
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   sys_user
+  </code>
+  →
+  <strong>
+   Groups
+  </strong>
+  related list.
+ </li>
+ <li style="margin-bottom: 4px;">
+  Look at the
+  <strong>
+   Created
+  </strong>
+  (
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   sys_created_on
+  </code>
+  ) timestamp for "Network Operations". It will
+  <strong>
+   not
+  </strong>
+  be today's date - it preserves the original date they joined the group.
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Transferred User (
+   <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+    bwhite
+   </code>
+   ):
+  </strong>
+ </li>
+ <li style="margin-bottom: 4px;">
+  Removed from "Network Operations".
+ </li>
+ <li style="margin-bottom: 4px;">
+  Now in "Cloud Infrastructure".
+ </li>
+ <li style="margin-bottom: 4px;">
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   sn_employee_profile
+  </code>
+  updated to "Cloud Infrastructure".
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   System Logs:
+  </strong>
+ </li>
+ <li style="margin-bottom: 4px;">
+  Navigate to
+  <strong>
+   System Logs → System Log → Application Logs
+  </strong>
+  .
+ </li>
+ <li style="margin-bottom: 4px;">
+  Filter by Message contains
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   RG Import #3:
+  </code>
+  .
+ </li>
+ <li style="margin-bottom: 4px;">
+  You will see:
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   RG Import #3: Transferred user bwhite from old group Network Operations to Cloud Infrastructure
+  </code>
+  .
+ </li>
+</ol>
+<hr style="border: 0; border-top: 1px solid lightgray; margin: 24px 0;"/>
+<h2 style="font-size: 18px; font-weight: bold; border-bottom: 1px solid lightgray; padding-bottom: 6px; margin-top: 24px; margin-bottom: 12px; color: black;">
+ What Does NOT Need to Change
+</h2>
+<p>
+ Everything else in your architecture remains exactly as-is:
+ <br/>
+ -
+ <strong>
+  Data Source:
+ </strong>
+ <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+  Monthly Resource Group CSV
+ </code>
+ (same setup)
+ <br/>
+ -
+ <strong>
+  Staging Table:
+ </strong>
+ <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+  Primary_resource_group_updates
+ </code>
+ (same fields)
+ <br/>
+ -
+ <strong>
+  Transform Map #1:
+ </strong>
+ <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+  RG Import - 1 - Create Groups
+ </code>
+ (no change)
+ <br/>
+ -
+ <strong>
+  Transform Map #2:
+ </strong>
+ <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+  RG Import - 2 - Assign Role
+ </code>
+ (no change)
+ <br/>
+ -
+ <strong>
+  Transform Map #2.5:
+ </strong>
+ <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+  RG Import - 2.5 - Update User Schedule and FTE
+ </code>
+ (no change)
+ <br/>
+ -
+ <strong>
+  Transform Map #4:
+ </strong>
+ <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+  RG Import - 4 - Set Employee Profile
+ </code>
+ (no change)
+</p>
+
+
+</div>

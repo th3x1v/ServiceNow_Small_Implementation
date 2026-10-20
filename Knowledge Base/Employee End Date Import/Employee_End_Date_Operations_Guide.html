@@ -1,0 +1,243 @@
+<!-- 
+  ServiceNow Knowledge Base Article: KB - Employee End Date Operations Guide
+  Category: Employee End Date Import
+  Instructions:
+  1. Open ServiceNow -> Knowledge -> Articles -> Create New (or open kb_knowledge form).
+  2. In the "Article Body" (text field) TinyMCE toolbar, click the Source Code icon (<>).
+  3. Paste this entire HTML block into the source window and click OK.
+  4. Fill in Short Description: "KB - Employee End Date Operations Guide"
+  5. Select Knowledge Base and Category: "Employee End Date Import"
+  6. Click Save or Publish.
+-->
+<div class="sn-kb-article" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 14px; line-height: 1.6; color: black; max-width: 100%;">
+  
+  <!-- KB Metadata Header Callout -->
+  <div class="alert alert-info" style="padding: 12px 16px; margin-bottom: 20px; border: 1px solid lightgray; border-left: 5px solid darkblue; border-radius: 4px; background-color: aliceblue; font-size: 13px;">
+    <div style="font-weight: bold; font-size: 15px; margin-bottom: 4px; color: darkblue;">Knowledge Base Article Details</div>
+    <div><strong>Title:</strong> KB - Employee End Date Operations Guide</div>
+    <div><strong>Category:</strong> Employee End Date Import</div>
+    <div><strong>Audience:</strong> ServiceNow Administrators, Change Managers, IT Operations</div>
+  </div>
+
+  <!-- Article Body Content -->
+<h1 style="font-size: 22px; font-weight: bold; border-bottom: 2px solid lightgray; padding-bottom: 8px; margin-top: 16px; margin-bottom: 16px; color: black;">
+ Employee End Date Import  -  Operations Guide
+</h1>
+<p>
+ This document outlines the standard operating procedure for manually importing and updating Employee End Dates using the pre-configured Data Source and Transform Map.
+</p>
+<p>
+ <em>
+  Note: Ensure the one-time setup has been completed per the Setup Guide before following these steps.
+ </em>
+</p>
+<hr style="border: 0; border-top: 1px solid lightgray; margin: 24px 0;"/>
+<h2 style="font-size: 18px; font-weight: bold; border-bottom: 1px solid lightgray; padding-bottom: 6px; margin-top: 24px; margin-bottom: 12px; color: black;">
+ Prerequisites
+</h2>
+<ol style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+ <li style="margin-bottom: 4px;">
+  You need a CSV file containing exactly two columns:
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   SAM Account Name
+  </strong>
+  (The exact AD username, e.g.,
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   jsmith
+  </code>
+  )
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   End Date
+  </strong>
+  (Ensure the date format in the CSV matches the format configured in your Transform Map, e.g.,
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   yyyy-MM-dd
+  </code>
+  )
+ </li>
+ <li style="margin-bottom: 4px;">
+  You must have the
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   import_admin
+  </code>
+  role (or equivalent) in ServiceNow.
+ </li>
+</ol>
+<hr style="border: 0; border-top: 1px solid lightgray; margin: 24px 0;"/>
+<h2 style="font-size: 18px; font-weight: bold; border-bottom: 1px solid lightgray; padding-bottom: 6px; margin-top: 24px; margin-bottom: 12px; color: black;">
+ Step 1: Upload the CSV Data
+</h2>
+<p>
+ Since this is an ad-hoc manual import, you will attach the file directly to the Data Source.
+</p>
+<ol style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+ <li style="margin-bottom: 4px;">
+  Navigate to
+  <strong>
+   System Import Sets → Administration → Data Sources
+  </strong>
+  .
+ </li>
+ <li style="margin-bottom: 4px;">
+  Search for and open the Data Source named
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   Manual Employee End Date Import
+  </code>
+  .
+ </li>
+ <li style="margin-bottom: 4px;">
+  At the top of the form, click the
+  <strong>
+   Paperclip (Manage Attachments)
+  </strong>
+  icon.
+ </li>
+ <li style="margin-bottom: 4px;">
+  If there are any old CSV files attached to this record,
+  <strong>
+   delete them
+  </strong>
+  to prevent ServiceNow from loading old data.
+ </li>
+ <li style="margin-bottom: 4px;">
+  Upload your new CSV file.
+ </li>
+ <li style="margin-bottom: 4px;">
+  Close the attachment dialog.
+ </li>
+</ol>
+<h2 style="font-size: 18px; font-weight: bold; border-bottom: 1px solid lightgray; padding-bottom: 6px; margin-top: 24px; margin-bottom: 12px; color: black;">
+ Step 2: Load the Data into the Staging Table
+</h2>
+<ol style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+ <li style="margin-bottom: 4px;">
+  On the Data Source record, scroll down to the
+  <strong>
+   Related Links
+  </strong>
+  section.
+ </li>
+ <li style="margin-bottom: 4px;">
+  Click
+  <strong>
+   Load All Records
+  </strong>
+  .
+ </li>
+ <li style="margin-bottom: 4px;">
+  ServiceNow will parse your CSV and load it into the staging table.
+ </li>
+ <li style="margin-bottom: 4px;">
+  When finished, you will see a progress screen. Verify that the
+  <strong>
+   State
+  </strong>
+  is Complete and that the
+  <strong>
+   Processed
+  </strong>
+  record count matches the number of rows in your CSV.
+ </li>
+</ol>
+<h2 style="font-size: 18px; font-weight: bold; border-bottom: 1px solid lightgray; padding-bottom: 6px; margin-top: 24px; margin-bottom: 12px; color: black;">
+ Step 3: Run the Transform
+</h2>
+<ol style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+ <li style="margin-bottom: 4px;">
+  From the progress screen in the previous step, click the
+  <strong>
+   Run Transform
+  </strong>
+  link.
+  <br/>
+  <em>
+   (Alternatively, navigate to
+  </em>
+  <em>
+   System Import Sets → Import Sets
+  </em>
+  <em>
+   , open the newly created Import Set, and click
+  </em>
+  <em>
+   Transform
+  </em>
+  <em>
+   ).
+  </em>
+ </li>
+ <li style="margin-bottom: 4px;">
+  In the "Specify Transform maps" slushbucket, ensure
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   Employee End Date Transform
+  </code>
+  is selected and in the right-hand bucket.
+ </li>
+ <li style="margin-bottom: 4px;">
+  Click
+  <strong>
+   Transform
+  </strong>
+  .
+ </li>
+</ol>
+<h2 style="font-size: 18px; font-weight: bold; border-bottom: 1px solid lightgray; padding-bottom: 6px; margin-top: 24px; margin-bottom: 12px; color: black;">
+ Step 4: Verify the Results
+</h2>
+<ol style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+ <li style="margin-bottom: 4px;">
+  Review the Transform history on the screen.
+ </li>
+ <li style="margin-bottom: 4px;">
+  The
+  <strong>
+   Inserts
+  </strong>
+  column should be 0 (since we are only updating existing profiles).
+ </li>
+ <li style="margin-bottom: 4px;">
+  The
+  <strong>
+   Updates
+  </strong>
+  column should match the number of valid users in your CSV.
+ </li>
+ <li style="margin-bottom: 4px;">
+  The
+  <strong>
+   Errors / Ignored
+  </strong>
+  columns should be reviewed if they are greater than 0:
+ </li>
+ <li style="margin-bottom: 4px;">
+  <em>
+   If records were Ignored:
+  </em>
+  It likely means the SAM Account Name in the CSV did not match any active user in the
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   sys_user
+  </code>
+  table (due to the
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   reject
+  </code>
+  choice action on the coalesce field).
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Spot Check:
+  </strong>
+  Navigate to
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   sn_employee_profile.list
+  </code>
+  , search for 2-3 users from your CSV, and verify their End Date field is populated correctly.
+ </li>
+</ol>
+
+
+</div>

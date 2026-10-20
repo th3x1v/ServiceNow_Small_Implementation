@@ -1,0 +1,321 @@
+<!-- 
+  ServiceNow Knowledge Base Article: KB - Import Project Checklist
+  Category: Asset Import and Transforms
+  Instructions:
+  1. Open ServiceNow -> Knowledge -> Articles -> Create New (or open kb_knowledge form).
+  2. In the "Article Body" (text field) TinyMCE toolbar, click the Source Code icon (<>).
+  3. Paste this entire HTML block into the source window and click OK.
+  4. Fill in Short Description: "KB - Import Project Checklist"
+  5. Select Knowledge Base and Category: "Asset Import and Transforms"
+  6. Click Save or Publish.
+-->
+<div class="sn-kb-article" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 14px; line-height: 1.6; color: black; max-width: 100%;">
+  
+  <!-- KB Metadata Header Callout -->
+  <div class="alert alert-info" style="padding: 12px 16px; margin-bottom: 20px; border: 1px solid lightgray; border-left: 5px solid darkblue; border-radius: 4px; background-color: aliceblue; font-size: 13px;">
+    <div style="font-weight: bold; font-size: 15px; margin-bottom: 4px; color: darkblue;">Knowledge Base Article Details</div>
+    <div><strong>Title:</strong> KB - Import Project Checklist</div>
+    <div><strong>Category:</strong> Asset Import and Transforms</div>
+    <div><strong>Audience:</strong> ServiceNow Administrators, Change Managers, IT Operations</div>
+  </div>
+
+  <!-- Article Body Content -->
+<h1 style="font-size: 22px; font-weight: bold; border-bottom: 2px solid lightgray; padding-bottom: 8px; margin-top: 16px; margin-bottom: 16px; color: black;">
+ Resource Management Import - Setup Checklist (Schedule &amp; FTE Configuration)
+</h1>
+<p>
+ This checklist tracks your step-by-step progress for configuring programmatic work schedules and Average Daily FTE Hours (Hours per Person-Day) during your Resource imports. All standard import sets and basic mappings have been successfully vetted and are excluded.
+</p>
+<hr style="border: 0; border-top: 1px solid lightgray; margin: 24px 0;"/>
+<h2 style="font-size: 18px; font-weight: bold; border-bottom: 1px solid lightgray; padding-bottom: 6px; margin-top: 24px; margin-bottom: 12px; color: black;">
+ Phase 1: Global Resource Configuration
+</h2>
+<ul style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+ <li style="margin-bottom: 4px;">
+  [ ]
+  <strong>
+   Step 1: Set Global Average Daily FTE Hours
+  </strong>
+ </li>
+ <li style="margin-bottom: 4px;">
+  Navigate to
+  <strong>
+   Project Administration &gt; Settings &gt; Properties  -  Resource
+  </strong>
+  (or open the
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   sys_properties.list
+  </code>
+  and search for the
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   com.snc.resource_management.average_daily_fte
+  </code>
+  property).
+ </li>
+ <li style="margin-bottom: 4px;">
+  Verify or configure the property to your organization's standard workday length (typically
+  <strong>
+   <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+    8
+   </code>
+  </strong>
+  hours). This serves as the system default.
+ </li>
+</ul>
+<hr style="border: 0; border-top: 1px solid lightgray; margin: 24px 0;"/>
+<h2 style="font-size: 18px; font-weight: bold; border-bottom: 1px solid lightgray; padding-bottom: 6px; margin-top: 24px; margin-bottom: 12px; color: black;">
+ Phase 2: Resource Schedule Assignment (User Transform Map)
+</h2>
+<p>
+ You can implement this via one of the following validated approaches:
+</p>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ Option A: No-Code "Default Value" Field Map (Recommended)
+</h3>
+<ul style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+ <li style="margin-bottom: 4px;">
+  [ ]
+  <strong>
+   Step 1: Configure Standard Schedule Mapping
+  </strong>
+ </li>
+ <li style="margin-bottom: 4px;">
+  Open your existing User (
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   sys_user
+  </code>
+  ) Transform Map.
+ </li>
+ <li style="margin-bottom: 4px;">
+  In the
+  <strong>
+   Field Maps
+  </strong>
+  related list, click
+  <strong>
+   New
+  </strong>
+  and configure:
+  <ul style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+   <li style="margin-bottom: 4px;">
+    <strong>
+     Source field
+    </strong>
+    : Select
+    <strong>
+     <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+      [None]
+     </code>
+    </strong>
+    (or
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     (none)
+    </code>
+    /
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     (none - use default value)
+    </code>
+    ).
+   </li>
+   <li style="margin-bottom: 4px;">
+    <strong>
+     Target field
+    </strong>
+    : Select
+    <strong>
+     <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+      schedule
+     </code>
+    </strong>
+    (Reference field pointing to
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     cmn_schedule
+    </code>
+    ).
+   </li>
+   <li style="margin-bottom: 4px;">
+    <strong>
+     Referenced value field
+    </strong>
+    : Select
+    <strong>
+     <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+      name
+     </code>
+    </strong>
+    (resolves schedule by name).
+   </li>
+   <li style="margin-bottom: 4px;">
+    <strong>
+     Use default value
+    </strong>
+    : Check this box.
+   </li>
+   <li style="margin-bottom: 4px;">
+    <strong>
+     Default value
+    </strong>
+    : Enter the exact name of your standard working schedule (e.g.,
+    <strong>
+     <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+      8-5 weekdays
+     </code>
+    </strong>
+    ).
+   </li>
+   <li style="margin-bottom: 4px;">
+    <strong>
+     Choice action
+    </strong>
+    : Set to
+    <strong>
+     <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+      reject
+     </code>
+    </strong>
+    (prevents silent failures if the calendar name is misspelled).
+   </li>
+  </ul>
+ </li>
+</ul>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ Option B: Scripted
+ <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+  onAfter
+ </code>
+ Transform Script (Group-based Assignment Alternative)
+</h3>
+<ul style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+ <li style="margin-bottom: 4px;">
+  [ ]
+  <strong>
+   Step 1: Implement Transform Script
+  </strong>
+ </li>
+ <li style="margin-bottom: 4px;">
+  If you only want to assign schedules specifically when users are added to a Resource Group, add the
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   onAfter
+  </code>
+  transform script to your Group Member (
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   sys_user_grmember
+  </code>
+  ) Transform Map.
+ </li>
+ <li style="margin-bottom: 4px;">
+  Verify the script correctly checks for
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   PPS Resource
+  </code>
+  group type and queries
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   cmn_schedule
+  </code>
+  by name.
+ </li>
+</ul>
+<hr style="border: 0; border-top: 1px solid lightgray; margin: 24px 0;"/>
+<h2 style="font-size: 18px; font-weight: bold; border-bottom: 1px solid lightgray; padding-bottom: 6px; margin-top: 24px; margin-bottom: 12px; color: black;">
+ Phase 3: Average Daily FTE / Workday Overrides
+</h2>
+<p>
+ Configure these overrides if groups/users have different workday hours than the global standard:
+</p>
+<ul style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+ <li style="margin-bottom: 4px;">
+  [ ]
+  <strong>
+   Step 1: Map Group-Level Overrides
+  </strong>
+ </li>
+ <li style="margin-bottom: 4px;">
+  In your Group (
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   sys_user_group
+  </code>
+  ) Transform Map, map your CSV's workday duration column directly to
+  <strong>
+   <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+    average_daily_fte
+   </code>
+  </strong>
+  (Decimal).
+ </li>
+ <li style="margin-bottom: 4px;">
+  Set
+  <strong>
+   Choice action
+  </strong>
+  :
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   create
+  </code>
+  (platform default).
+ </li>
+ <li style="margin-bottom: 4px;">
+  [ ]
+  <strong>
+   Step 2: Map User-Level Overrides (Optional)
+  </strong>
+ </li>
+ <li style="margin-bottom: 4px;">
+  In your User (
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   sys_user
+  </code>
+  ) Transform Map, map your CSV's workday duration column directly to
+  <strong>
+   <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+    average_daily_fte
+   </code>
+  </strong>
+  (Decimal).
+ </li>
+ <li style="margin-bottom: 4px;">
+  Set
+  <strong>
+   Choice action
+  </strong>
+  :
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   create
+  </code>
+  (platform default).
+ </li>
+</ul>
+<hr style="border: 0; border-top: 1px solid lightgray; margin: 24px 0;"/>
+<h2 style="font-size: 18px; font-weight: bold; border-bottom: 1px solid lightgray; padding-bottom: 6px; margin-top: 24px; margin-bottom: 12px; color: black;">
+ Phase 4: Verification
+</h2>
+<ul style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+ <li style="margin-bottom: 4px;">
+  [ ]
+  <strong>
+   Step 1: Verify Group Overrides
+  </strong>
+ </li>
+ <li style="margin-bottom: 4px;">
+  Open an imported Resource Group record and confirm the
+  <strong>
+   Average daily FTE hours
+  </strong>
+  matches the CSV workday override.
+ </li>
+ <li style="margin-bottom: 4px;">
+  [ ]
+  <strong>
+   Step 2: Verify User Work Schedules
+  </strong>
+ </li>
+ <li style="margin-bottom: 4px;">
+  Open a newly imported Resource User record and verify that the
+  <strong>
+   Schedule
+  </strong>
+  reference field is correctly set to your standard working calendar.
+ </li>
+</ul>
+
+
+</div>

@@ -1,0 +1,3008 @@
+<!-- 
+  ServiceNow Knowledge Base Article: KB - Resource Group Import Setup Guide
+  Category: Resource Group Transforms
+  Instructions:
+  1. Open ServiceNow -> Knowledge -> Articles -> Create New (or open kb_knowledge form).
+  2. In the "Article Body" (text field) TinyMCE toolbar, click the Source Code icon (<>).
+  3. Paste this entire HTML block into the source window and click OK.
+  4. Fill in Short Description: "KB - Resource Group Import Setup Guide"
+  5. Select Knowledge Base and Category: "Resource Group Transforms"
+  6. Click Save or Publish.
+-->
+<div class="sn-kb-article" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 14px; line-height: 1.6; color: black; max-width: 100%;">
+  
+  <!-- KB Metadata Header Callout -->
+  <div class="alert alert-info" style="padding: 12px 16px; margin-bottom: 20px; border: 1px solid lightgray; border-left: 5px solid darkblue; border-radius: 4px; background-color: aliceblue; font-size: 13px;">
+    <div style="font-weight: bold; font-size: 15px; margin-bottom: 4px; color: darkblue;">Knowledge Base Article Details</div>
+    <div><strong>Title:</strong> KB - Resource Group Import Setup Guide</div>
+    <div><strong>Category:</strong> Resource Group Transforms</div>
+    <div><strong>Audience:</strong> ServiceNow Administrators, Change Managers, IT Operations</div>
+  </div>
+
+  <!-- Article Body Content -->
+<h1 style="font-size: 22px; font-weight: bold; border-bottom: 2px solid lightgray; padding-bottom: 8px; margin-top: 16px; margin-bottom: 16px; color: black;">
+ Resource Group Import  -  Setup Guide (One-Time)
+</h1>
+<p>
+ This document covers the
+ <strong>
+  one-time setup
+ </strong>
+ for the ServiceNow Resource Group Import framework. After completing these steps, you will have a fully automated monthly pipeline ready to use. See the
+ <strong>
+  Operations Guide
+ </strong>
+ for monthly usage instructions.
+</p>
+<p>
+ <strong>
+  Modules Used:
+ </strong>
+ SPM (Resource Management, Capacity Planning) and ITSM
+</p>
+<hr style="border: 0; border-top: 1px solid lightgray; margin: 24px 0;"/>
+<h2 style="font-size: 18px; font-weight: bold; border-bottom: 1px solid lightgray; padding-bottom: 6px; margin-top: 24px; margin-bottom: 12px; color: black;">
+ Configuration Reference
+</h2>
+<table class="table table-bordered table-striped" style="width: 100%; border-collapse: collapse; margin: 16px 0; border: 1px solid lightgray; font-size: 13px;">
+ <thead>
+  <tr>
+   <th style="background-color: whitesmoke; border: 1px solid lightgray; padding: 8px 10px; text-align: left; font-weight: bold; color: black;">
+    Item
+   </th>
+   <th style="background-color: whitesmoke; border: 1px solid lightgray; padding: 8px 10px; text-align: left; font-weight: bold; color: black;">
+    Value
+   </th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     User lookup field
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     u_samaccountname
+    </code>
+    on
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     sys_user
+    </code>
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Employee Profile table
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     sn_employee_profile
+    </code>
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Resource group field
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     primary_resource_group
+    </code>
+    on
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     sn_employee_profile
+    </code>
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Group role requirement
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    Groups must have the
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     pps_resource
+    </code>
+    role
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Conflict handling
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    Overwrite  -  CSV is source of truth
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Frequency
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    Monthly
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     SPM plugins
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     com.snc.resource_management
+    </code>
+    ,
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     com.snc.capacity_management
+    </code>
+    ,
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     com.snc.project_portfolio_suite
+    </code>
+   </td>
+  </tr>
+ </tbody>
+</table>
+<hr style="border: 0; border-top: 1px solid lightgray; margin: 24px 0;"/>
+<h2 style="font-size: 18px; font-weight: bold; border-bottom: 1px solid lightgray; padding-bottom: 6px; margin-top: 24px; margin-bottom: 12px; color: black;">
+ What You're Building
+</h2>
+<p>
+ A fully automated,
+ <strong>
+  delta-based
+ </strong>
+ Import Pipeline that processes the monthly CSV while preserving historical membership data:
+</p>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ Delta-Based Architecture (No Mass Wipes)
+</h3>
+<p>
+ In earlier versions of this pipeline, a pre-cleanup step wiped all memberships from
+ <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+  pps_resource
+ </code>
+ groups before every run. That approach is now
+ <strong>
+  retired
+ </strong>
+ so that:
+ <br/>
+ - Historical group membership records and their original creation dates (
+ <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+  sys_created_on
+ </code>
+ ) are preserved.
+ <br/>
+ - Unchanged employees are left completely untouched.
+ <br/>
+ - Employees who transfer to a new team have their old team membership cleanly removed and new membership added dynamically during the transform.
+</p>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ Import Pipeline (Import Sets + 5 Transform Maps)
+</h3>
+<p>
+ An Import Set with five chained Transform Maps that process the CSV in order:
+</p>
+<table class="table table-bordered table-striped" style="width: 100%; border-collapse: collapse; margin: 16px 0; border: 1px solid lightgray; font-size: 13px;">
+ <thead>
+  <tr>
+   <th style="background-color: whitesmoke; border: 1px solid lightgray; padding: 8px 10px; text-align: left; font-weight: bold; color: black;">
+    Run Order
+   </th>
+   <th style="background-color: whitesmoke; border: 1px solid lightgray; padding: 8px 10px; text-align: left; font-weight: bold; color: black;">
+    Transform Map
+   </th>
+   <th style="background-color: whitesmoke; border: 1px solid lightgray; padding: 8px 10px; text-align: left; font-weight: bold; color: black;">
+    Target Table
+   </th>
+   <th style="background-color: whitesmoke; border: 1px solid lightgray; padding: 8px 10px; text-align: left; font-weight: bold; color: black;">
+    Purpose
+   </th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     100
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     RG Import - 1 - Create Groups
+    </code>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     sys_user_group
+    </code>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    Creates groups that don't exist
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     200
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     RG Import - 2 - Assign Role
+    </code>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     sys_group_has_role
+    </code>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    Assigns
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     pps_resource
+    </code>
+    role to each group
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     250
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     RG Import - 2.5 - Update User Schedule and FTE
+    </code>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     sys_user
+    </code>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    Assigns schedules and user-level FTE from the CSV
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     300
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     RG Import - 3 - Create Memberships
+    </code>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     sys_user_grmember
+    </code>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    Manages memberships with delta cleanup (removes old group only on transfer)
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     400
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     RG Import - 4 - Set Employee Profile
+    </code>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     sn_employee_profile
+    </code>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    Sets
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     primary_resource_group
+    </code>
+    reference
+   </td>
+  </tr>
+ </tbody>
+</table>
+<hr style="border: 0; border-top: 1px solid lightgray; margin: 24px 0;"/>
+<h2 style="font-size: 18px; font-weight: bold; border-bottom: 1px solid lightgray; padding-bottom: 6px; margin-top: 24px; margin-bottom: 12px; color: black;">
+ Prerequisites
+</h2>
+<p>
+ Before starting setup, verify the following:
+</p>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ 1. The
+ <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+  pps_resource
+ </code>
+ role exists
+</h3>
+<ul style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+ <li style="margin-bottom: 4px;">
+  Navigate to
+  <strong>
+   User Administration → Roles
+  </strong>
+ </li>
+ <li style="margin-bottom: 4px;">
+  Search for
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   pps_resource
+  </code>
+ </li>
+ <li style="margin-bottom: 4px;">
+  Confirm it exists and note its
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   sys_id
+  </code>
+ </li>
+</ul>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ 2. The
+ <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+  primary_resource_group
+ </code>
+ field exists on
+ <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+  sn_employee_profile
+ </code>
+</h3>
+<ul style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+ <li style="margin-bottom: 4px;">
+  Navigate to an Employee Profile record
+ </li>
+ <li style="margin-bottom: 4px;">
+  Confirm the
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   primary_resource_group
+  </code>
+  field is present on the form
+ </li>
+ <li style="margin-bottom: 4px;">
+  If not visible, add it via
+  <strong>
+   Configure → Form Layout
+  </strong>
+ </li>
+</ul>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ 3. You have a sample CSV for testing
+</h3>
+<ul style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+ <li style="margin-bottom: 4px;">
+  Prepare a small CSV (5 - 10 rows) with the two columns:
+  <strong>
+   SAM Account Name
+  </strong>
+  and
+  <strong>
+   Capacity Team
+  </strong>
+ </li>
+ <li style="margin-bottom: 4px;">
+  Verify the SAM Account Names resolve in
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   sys_user
+  </code>
+  by searching
+  <strong>
+   User Administration → Users
+  </strong>
+  by
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   u_samaccountname
+  </code>
+ </li>
+</ul>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ 4. Backups
+</h3>
+<p>
+ Export the current state of these tables (
+ <strong>
+  list view → Export → CSV
+ </strong>
+ ):
+ <br/>
+ -
+ <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+  sys_user_group
+ </code>
+ <br/>
+ -
+ <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+  sys_group_has_role
+ </code>
+ <br/>
+ -
+ <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+  sys_user_grmember
+ </code>
+ <br/>
+ -
+ <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+  sn_employee_profile
+ </code>
+ (at minimum the
+ <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+  user
+ </code>
+ and
+ <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+  primary_resource_group
+ </code>
+ columns)
+</p>
+<hr style="border: 0; border-top: 1px solid lightgray; margin: 24px 0;"/>
+<h2 style="font-size: 18px; font-weight: bold; border-bottom: 1px solid lightgray; padding-bottom: 6px; margin-top: 24px; margin-bottom: 12px; color: black;">
+ Step 1: Deactivate Blanket Pre-Cleanup (Preserve History)
+</h2>
+<p>
+ In earlier versions of this setup, a pre-cleanup step (either via Flow Designer or a Fix Script) was used to wipe all user memberships from all
+ <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+  pps_resource
+ </code>
+ groups prior to running the import.
+</p>
+<p>
+ <strong>
+  That blanket wipe is now retired and must be deactivated.
+ </strong>
+</p>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ Why Blanket Cleanup Was Retired
+</h3>
+<ul style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Destroys Membership History:
+  </strong>
+  Mass-deleting memberships resets
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   sys_created_on
+  </code>
+  timestamps every month, wiping out records of how long employees have belonged to their capacity teams.
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Unnecessary Churn:
+  </strong>
+  90%+ of employees stay in the same team month-over-month. Deleting and re-adding them generates tens of thousands of audit records and risks temporary permission drops.
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Handled by Delta Transforms:
+  </strong>
+  Group cleanup is now handled dynamically on a per-user basis in
+  <strong>
+   Transform Map #3 (Step 6)
+  </strong>
+  . If an employee transfers to a new team, their old membership is cleanly removed during the transform while untouched employees are left completely preserved.
+ </li>
+</ul>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ Actions Required:
+</h3>
+<ol style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+ <li style="margin-bottom: 4px;">
+  <strong>
+   If you previously created the Flow Designer Flow (
+   <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+    RG Import - Pre-Cleanup
+   </code>
+   ):
+  </strong>
+ </li>
+ <li style="margin-bottom: 4px;">
+  Navigate to
+  <strong>
+   Process Automation → Flow Designer
+  </strong>
+  .
+ </li>
+ <li style="margin-bottom: 4px;">
+  Open
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   RG Import - Pre-Cleanup
+  </code>
+  .
+ </li>
+ <li style="margin-bottom: 4px;">
+  <p>
+   Click
+   <strong>
+    Deactivate
+   </strong>
+   at the top right.
+  </p>
+ </li>
+ <li style="margin-bottom: 4px;">
+  <p>
+   <strong>
+    If you previously created the Fix Script (
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     RG Import - Pre-Cleanup
+    </code>
+    ):
+   </strong>
+  </p>
+ </li>
+ <li style="margin-bottom: 4px;">
+  Do
+  <strong>
+   NOT
+  </strong>
+  run the Fix Script before monthly imports. (You may leave it inactive or delete it).
+ </li>
+</ol>
+<hr style="border: 0; border-top: 1px solid lightgray; margin: 24px 0;"/>
+<h2 style="font-size: 18px; font-weight: bold; border-bottom: 1px solid lightgray; padding-bottom: 6px; margin-top: 24px; margin-bottom: 12px; color: black;">
+ Step 2: Set Up the Import Set Staging Table
+</h2>
+<p>
+ The staging table
+ <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+  Primary_resource_group_updates
+ </code>
+ is used to hold the CSV data before it is transformed. It needs five columns: SAM Account Name, Capacity Team, Role, Schedule, and FTE Hours.
+</p>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ 2.1  -  Load the CSV
+</h3>
+<ol style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+ <li style="margin-bottom: 4px;">
+  Navigate to
+  <strong>
+   System Import Sets → Load Data
+  </strong>
+ </li>
+ <li style="margin-bottom: 4px;">
+  Configure:
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Import Set Table:
+  </strong>
+  Select the existing table
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   Primary_resource_group_updates
+  </code>
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Source of Import:
+  </strong>
+  File
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   File:
+  </strong>
+  Upload your CSV
+ </li>
+ <li style="margin-bottom: 4px;">
+  Click
+  <strong>
+   Submit
+  </strong>
+ </li>
+</ol>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ 2.2  -  Add the Role, Schedule, and FTE Hours Columns (If Not Already Present)
+</h3>
+<p>
+ If the staging table was originally created with only two columns (SAM Account Name and Capacity Team), you need to add the Role, Schedule, and FTE Hours columns manually:
+</p>
+<ol style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+ <li style="margin-bottom: 4px;">
+  Navigate to
+  <strong>
+   System Definition → Tables
+  </strong>
+ </li>
+ <li style="margin-bottom: 4px;">
+  Search for
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   Primary_resource_group_updates
+  </code>
+ </li>
+ <li style="margin-bottom: 4px;">
+  Open the table record
+ </li>
+ <li style="margin-bottom: 4px;">
+  Go to the
+  <strong>
+   Columns
+  </strong>
+  related list
+ </li>
+ <li style="margin-bottom: 4px;">
+  Click
+  <strong>
+   New
+  </strong>
+ </li>
+ <li style="margin-bottom: 4px;">
+  Fill in:
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Column label:
+  </strong>
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   Role
+  </code>
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Type:
+  </strong>
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   String
+  </code>
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Max length:
+  </strong>
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   100
+  </code>
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Save
+  </strong>
+  -  ServiceNow will auto-generate the column name (e.g.,
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   u_role
+  </code>
+  )
+ </li>
+ <li style="margin-bottom: 4px;">
+  Click
+  <strong>
+   New
+  </strong>
+  again
+ </li>
+ <li style="margin-bottom: 4px;">
+  Fill in:
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Column label:
+  </strong>
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   Schedule
+  </code>
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Type:
+  </strong>
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   String
+  </code>
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Max length:
+  </strong>
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   100
+  </code>
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Save
+  </strong>
+  -  ServiceNow will auto-generate the column name (e.g.,
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   u_schedule
+  </code>
+  )
+ </li>
+ <li style="margin-bottom: 4px;">
+  Click
+  <strong>
+   New
+  </strong>
+  again
+ </li>
+ <li style="margin-bottom: 4px;">
+  Fill in:
+  <ul style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+   <li style="margin-bottom: 4px;">
+    <strong>
+     Column label:
+    </strong>
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     FTE Hours
+    </code>
+   </li>
+   <li style="margin-bottom: 4px;">
+    <strong>
+     Type:
+    </strong>
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     Decimal
+    </code>
+   </li>
+  </ul>
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Save
+  </strong>
+  -  ServiceNow will auto-generate the column name (e.g.,
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   u_fte_hours
+  </code>
+  )
+ </li>
+</ol>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ 2.3  -  Verify the Staging Table
+</h3>
+<ol style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+ <li style="margin-bottom: 4px;">
+  Open the staging table and confirm:
+ </li>
+ <li style="margin-bottom: 4px;">
+  The five columns are present:
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   u_sam_account_name
+  </code>
+  ,
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   u_capacity_planning
+  </code>
+  ,
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   u_role
+  </code>
+  ,
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   u_schedule
+  </code>
+  , and
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   u_fte_hours
+  </code>
+ </li>
+ <li style="margin-bottom: 4px;">
+  Data is loaded correctly
+ </li>
+ <li style="margin-bottom: 4px;">
+  Import Set State =
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   Loaded
+  </code>
+ </li>
+</ol>
+<div class="alert alert-warning" style="padding: 12px 16px; margin: 16px 0; border: 1px solid lightgray; border-left: 5px solid darkgoldenrod; border-radius: 4px; background-color: lightyellow; font-size: 13px;">
+ <strong style="color: darkgoldenrod;">
+  Important:
+ </strong>
+ <p>
+  Note the
+  <strong>
+   exact column names
+  </strong>
+  -  you'll reference them in the Transform Map field mappings. The names may vary based on your CSV headers (e.g.,
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   u_sam_account_name
+  </code>
+  vs
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   u_samaccountname
+  </code>
+  ).
+ </p>
+</div>
+<div class="alert alert-warning" style="padding: 12px 16px; margin: 16px 0; border: 1px solid lightgray; border-left: 5px solid darkgoldenrod; border-radius: 4px; background-color: lightyellow; font-size: 13px;">
+ <strong style="color: darkgoldenrod;">
+  Important:
+ </strong>
+ <p>
+  <strong>
+   Do NOT run the transform yet.
+  </strong>
+  Create all five Transform Maps first.
+ </p>
+</div>
+<hr style="border: 0; border-top: 1px solid lightgray; margin: 24px 0;"/>
+<h2 style="font-size: 18px; font-weight: bold; border-bottom: 1px solid lightgray; padding-bottom: 6px; margin-top: 24px; margin-bottom: 12px; color: black;">
+ Step 3: Create Transform Map #1  -  Create Groups
+</h2>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ 3.1  -  Create the Transform Map
+</h3>
+<ol style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+ <li style="margin-bottom: 4px;">
+  Navigate to
+  <strong>
+   System Import Sets → Transform Maps
+  </strong>
+ </li>
+ <li style="margin-bottom: 4px;">
+  Click
+  <strong>
+   New
+  </strong>
+ </li>
+ <li style="margin-bottom: 4px;">
+  Fill in:
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Name:
+  </strong>
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   RG Import - 1 - Create Groups
+  </code>
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Source table:
+  </strong>
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   Primary_resource_group_updates
+  </code>
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Target table:
+  </strong>
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   sys_user_group
+  </code>
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Active:
+  </strong>
+  checked
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Run order:
+  </strong>
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   100
+  </code>
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Save
+  </strong>
+ </li>
+</ol>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ 3.2  -  Add Field Mapping: Group Name
+</h3>
+<p>
+ Click
+ <strong>
+  New
+ </strong>
+ in the
+ <strong>
+  Field Maps
+ </strong>
+ related list:
+</p>
+<table class="table table-bordered table-striped" style="width: 100%; border-collapse: collapse; margin: 16px 0; border: 1px solid lightgray; font-size: 13px;">
+ <thead>
+  <tr>
+   <th style="background-color: whitesmoke; border: 1px solid lightgray; padding: 8px 10px; text-align: left; font-weight: bold; color: black;">
+    Setting
+   </th>
+   <th style="background-color: whitesmoke; border: 1px solid lightgray; padding: 8px 10px; text-align: left; font-weight: bold; color: black;">
+    Value
+   </th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Source field
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     u_capacity_planning
+    </code>
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Target field
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     name
+    </code>
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Coalesce
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Yes
+    </strong>
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Choice action
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     reject
+    </code>
+   </td>
+  </tr>
+ </tbody>
+</table>
+<p>
+ <strong>
+  Save
+ </strong>
+ the field map.
+</p>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ 3.3  -  (Optional) Add Field Mapping: Description
+</h3>
+<table class="table table-bordered table-striped" style="width: 100%; border-collapse: collapse; margin: 16px 0; border: 1px solid lightgray; font-size: 13px;">
+ <thead>
+  <tr>
+   <th style="background-color: whitesmoke; border: 1px solid lightgray; padding: 8px 10px; text-align: left; font-weight: bold; color: black;">
+    Setting
+   </th>
+   <th style="background-color: whitesmoke; border: 1px solid lightgray; padding: 8px 10px; text-align: left; font-weight: bold; color: black;">
+    Value
+   </th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Source field
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    (none  -  use
+    <strong>
+     Choice action: set default value
+    </strong>
+    )
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Target field
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     description
+    </code>
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Coalesce
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    No
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Default value
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     Auto-created from monthly CSV import
+    </code>
+   </td>
+  </tr>
+ </tbody>
+</table>
+<p>
+ <strong>
+  Save
+ </strong>
+ the field map.
+</p>
+<hr style="border: 0; border-top: 1px solid lightgray; margin: 24px 0;"/>
+<h2 style="font-size: 18px; font-weight: bold; border-bottom: 1px solid lightgray; padding-bottom: 6px; margin-top: 24px; margin-bottom: 12px; color: black;">
+ Step 4: Create Transform Map #2  -  Assign pps_resource Role
+</h2>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ 4.1  -  Create the Transform Map
+</h3>
+<ol style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+ <li style="margin-bottom: 4px;">
+  Navigate to
+  <strong>
+   System Import Sets → Transform Maps
+  </strong>
+ </li>
+ <li style="margin-bottom: 4px;">
+  Click
+  <strong>
+   New
+  </strong>
+ </li>
+ <li style="margin-bottom: 4px;">
+  Fill in:
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Name:
+  </strong>
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   RG Import - 2 - Assign Role
+  </code>
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Source table:
+  </strong>
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   Primary_resource_group_updates
+  </code>
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Target table:
+  </strong>
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   sys_group_has_role
+  </code>
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Active:
+  </strong>
+  checked
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Run order:
+  </strong>
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   200
+  </code>
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Save
+  </strong>
+ </li>
+</ol>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ 4.2  -  Add Field Mapping: Group Reference
+</h3>
+<table class="table table-bordered table-striped" style="width: 100%; border-collapse: collapse; margin: 16px 0; border: 1px solid lightgray; font-size: 13px;">
+ <thead>
+  <tr>
+   <th style="background-color: whitesmoke; border: 1px solid lightgray; padding: 8px 10px; text-align: left; font-weight: bold; color: black;">
+    Setting
+   </th>
+   <th style="background-color: whitesmoke; border: 1px solid lightgray; padding: 8px 10px; text-align: left; font-weight: bold; color: black;">
+    Value
+   </th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Source field
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     u_capacity_planning
+    </code>
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Target field
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     group
+    </code>
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Coalesce
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Yes
+    </strong>
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Reference value
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     name
+    </code>
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Choice action
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     reject
+    </code>
+   </td>
+  </tr>
+ </tbody>
+</table>
+<p>
+ <strong>
+  Save
+ </strong>
+ the field map.
+</p>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ 4.3  -  Add Field Mapping: Role Reference
+</h3>
+<table class="table table-bordered table-striped" style="width: 100%; border-collapse: collapse; margin: 16px 0; border: 1px solid lightgray; font-size: 13px;">
+ <thead>
+  <tr>
+   <th style="background-color: whitesmoke; border: 1px solid lightgray; padding: 8px 10px; text-align: left; font-weight: bold; color: black;">
+    Setting
+   </th>
+   <th style="background-color: whitesmoke; border: 1px solid lightgray; padding: 8px 10px; text-align: left; font-weight: bold; color: black;">
+    Value
+   </th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Source field
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     u_role
+    </code>
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Target field
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     role
+    </code>
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Coalesce
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     No
+    </strong>
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Reference value
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     name
+    </code>
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Choice action
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     reject
+    </code>
+   </td>
+  </tr>
+ </tbody>
+</table>
+<p>
+ <strong>
+  Save
+ </strong>
+ the field map.
+</p>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ 4.4  -  Add an onBefore Script to Prevent Duplicate Errors
+</h3>
+<p>
+ Because ServiceNow often hides system-managed fields like
+ <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+  inherits
+ </code>
+ , the safest and most standard way to prevent the "duplicate target records" error is a simple
+ <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+  onBefore
+ </code>
+ script that bypasses Coalesce altogether.
+</p>
+<ol style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+ <li style="margin-bottom: 4px;">
+  In your Transform Map's
+  <strong>
+   Field Maps
+  </strong>
+  list, open both the
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   group
+  </code>
+  and
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   role
+  </code>
+  mappings and
+  <strong>
+   uncheck Coalesce
+  </strong>
+  on both.
+ </li>
+ <li style="margin-bottom: 4px;">
+  Go to the
+  <strong>
+   Transform Scripts
+  </strong>
+  related list and click
+  <strong>
+   New
+  </strong>
+  .
+ </li>
+ <li style="margin-bottom: 4px;">
+  Set
+  <strong>
+   When
+  </strong>
+  to
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   onBefore
+  </code>
+  .
+ </li>
+ <li style="margin-bottom: 4px;">
+  Paste the following script:
+ </li>
+</ol>
+<pre style="background-color: whitesmoke; border: 1px solid lightgray; border-radius: 4px; padding: 12px; overflow-x: auto; font-family: Consolas, Monaco, monospace; font-size: 13px; line-height: 1.45; margin: 14px 0;"><code class="language-javascript" style="font-family: Consolas, Monaco, monospace; color: black; background: transparent; padding: 0;">(function runTransformScript(source, map, log, target /*undefined onStart*/ ) {
+
+    var groupID = target.group;
+    var roleID = target.role;
+
+    if (groupID &amp;&amp; roleID) {
+        var ghr = new GlideRecord('sys_group_has_role');
+        ghr.addQuery('group', groupID);
+        ghr.addQuery('role', roleID);
+        ghr.query();
+
+        if (ghr.hasNext()) {
+            // Group already has this role. Skip to prevent errors.
+            ignore = true;
+        }
+    } else {
+        ignore = true;
+    }
+
+})(source, map, log, target);
+</code></pre>
+<ol style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Submit
+  </strong>
+  .
+ </li>
+</ol>
+<div class="alert alert-success" style="padding: 12px 16px; margin: 16px 0; border: 1px solid lightgray; border-left: 5px solid darkgreen; border-radius: 4px; background-color: honeydew; font-size: 13px;">
+ <strong style="color: darkgreen;">
+  Tip:
+ </strong>
+ <p>
+  <strong>
+   Why do we need this script?
+  </strong>
+  Since we turned off Coalesce, the system treats every row as an insert. This robust script checks if the group already has the role. If it does, it skips the insert (
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   ignore = true
+  </code>
+  ). This bypasses the multi-record error entirely and cleanly skips groups that already have the role.
+ </p>
+</div>
+<div class="alert alert-info" style="padding: 12px 16px; margin: 16px 0; border: 1px solid lightgray; border-left: 5px solid darkblue; border-radius: 4px; background-color: aliceblue; font-size: 13px;">
+ <strong style="color: darkblue;">
+  Note:
+ </strong>
+ <p>
+  The
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   u_role
+  </code>
+  column comes from the
+  <strong>
+   Role
+  </strong>
+  column in your CSV, which should contain
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   pps_resource
+  </code>
+  in every row. The Reference value
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   name
+  </code>
+  tells ServiceNow to look up the role by its name and resolve it to the
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   sys_user_role
+  </code>
+  record.
+ </p>
+</div>
+<hr style="border: 0; border-top: 1px solid lightgray; margin: 24px 0;"/>
+<h2 style="font-size: 18px; font-weight: bold; border-bottom: 1px solid lightgray; padding-bottom: 6px; margin-top: 24px; margin-bottom: 12px; color: black;">
+ Step 5: Create Transform Map #2.5  -  Update User Schedule and FTE
+</h2>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ 5.1  -  Create the Transform Map
+</h3>
+<ol style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+ <li style="margin-bottom: 4px;">
+  Navigate to
+  <strong>
+   System Import Sets → Transform Maps
+  </strong>
+ </li>
+ <li style="margin-bottom: 4px;">
+  Click
+  <strong>
+   New
+  </strong>
+ </li>
+ <li style="margin-bottom: 4px;">
+  Fill in:
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Name:
+  </strong>
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   RG Import - 2.5 - Update User Schedule and FTE
+  </code>
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Source table:
+  </strong>
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   Primary_resource_group_updates
+  </code>
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Target table:
+  </strong>
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   sys_user
+  </code>
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Active:
+  </strong>
+  checked
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Run order:
+  </strong>
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   250
+  </code>
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Save
+  </strong>
+ </li>
+</ol>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ 5.2  -  Add Field Mapping: User Lookup (Coalesce)
+</h3>
+<p>
+ Click
+ <strong>
+  New
+ </strong>
+ in the
+ <strong>
+  Field Maps
+ </strong>
+ related list:
+</p>
+<table class="table table-bordered table-striped" style="width: 100%; border-collapse: collapse; margin: 16px 0; border: 1px solid lightgray; font-size: 13px;">
+ <thead>
+  <tr>
+   <th style="background-color: whitesmoke; border: 1px solid lightgray; padding: 8px 10px; text-align: left; font-weight: bold; color: black;">
+    Setting
+   </th>
+   <th style="background-color: whitesmoke; border: 1px solid lightgray; padding: 8px 10px; text-align: left; font-weight: bold; color: black;">
+    Value
+   </th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Source field
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     u_sam_account_name
+    </code>
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Target field
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     u_samaccountname
+    </code>
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Coalesce
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Yes
+    </strong>
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Choice action
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     reject
+    </code>
+    (Enforces that we only update existing users; does not create new user accounts)
+   </td>
+  </tr>
+ </tbody>
+</table>
+<p>
+ <strong>
+  Save
+ </strong>
+ the field map.
+</p>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ 5.3  -  Add Field Mapping: Work Schedule
+</h3>
+<p>
+ This maps the standard company working schedule directly from the CSV column to the user record.
+</p>
+<p>
+ Click
+ <strong>
+  New
+ </strong>
+ in the
+ <strong>
+  Field Maps
+ </strong>
+ related list:
+</p>
+<table class="table table-bordered table-striped" style="width: 100%; border-collapse: collapse; margin: 16px 0; border: 1px solid lightgray; font-size: 13px;">
+ <thead>
+  <tr>
+   <th style="background-color: whitesmoke; border: 1px solid lightgray; padding: 8px 10px; text-align: left; font-weight: bold; color: black;">
+    Setting
+   </th>
+   <th style="background-color: whitesmoke; border: 1px solid lightgray; padding: 8px 10px; text-align: left; font-weight: bold; color: black;">
+    Value
+   </th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Source field
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     u_schedule
+    </code>
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Target field
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     schedule
+    </code>
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Referenced value field
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     name
+    </code>
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Choice action
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     reject
+    </code>
+    (Enforces strict data quality; if you type the calendar name wrong in the CSV, it rejects the record)
+   </td>
+  </tr>
+ </tbody>
+</table>
+<p>
+ <strong>
+  Save
+ </strong>
+ the field map.
+</p>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ 5.4  -  Add Field Mapping: Average Daily FTE Hours
+</h3>
+<p>
+ This maps the standard workday capacity duration (hours per person-day) directly from the CSV column to the resource user profile.
+</p>
+<p>
+ Click
+ <strong>
+  New
+ </strong>
+ in the
+ <strong>
+  Field Maps
+ </strong>
+ related list:
+</p>
+<table class="table table-bordered table-striped" style="width: 100%; border-collapse: collapse; margin: 16px 0; border: 1px solid lightgray; font-size: 13px;">
+ <thead>
+  <tr>
+   <th style="background-color: whitesmoke; border: 1px solid lightgray; padding: 8px 10px; text-align: left; font-weight: bold; color: black;">
+    Setting
+   </th>
+   <th style="background-color: whitesmoke; border: 1px solid lightgray; padding: 8px 10px; text-align: left; font-weight: bold; color: black;">
+    Value
+   </th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Source field
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     u_fte_hours
+    </code>
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Target field
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     average_daily_fte
+    </code>
+   </td>
+  </tr>
+ </tbody>
+</table>
+<p>
+ <strong>
+  Save
+ </strong>
+ the field map.
+</p>
+<hr style="border: 0; border-top: 1px solid lightgray; margin: 24px 0;"/>
+<h2 style="font-size: 18px; font-weight: bold; border-bottom: 1px solid lightgray; padding-bottom: 6px; margin-top: 24px; margin-bottom: 12px; color: black;">
+ Step 6: Create Transform Map #3  -  Create Memberships
+</h2>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ 6.1  -  Create the Transform Map
+</h3>
+<ol style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+ <li style="margin-bottom: 4px;">
+  Navigate to
+  <strong>
+   System Import Sets → Transform Maps
+  </strong>
+ </li>
+ <li style="margin-bottom: 4px;">
+  Click
+  <strong>
+   New
+  </strong>
+ </li>
+ <li style="margin-bottom: 4px;">
+  Fill in:
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Name:
+  </strong>
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   RG Import - 3 - Create Memberships
+  </code>
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Source table:
+  </strong>
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   Primary_resource_group_updates
+  </code>
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Target table:
+  </strong>
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   sys_user_grmember
+  </code>
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Active:
+  </strong>
+  checked
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Run order:
+  </strong>
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   300
+  </code>
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Save
+  </strong>
+ </li>
+</ol>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ 6.2  -  Add Field Mapping: User Reference
+</h3>
+<table class="table table-bordered table-striped" style="width: 100%; border-collapse: collapse; margin: 16px 0; border: 1px solid lightgray; font-size: 13px;">
+ <thead>
+  <tr>
+   <th style="background-color: whitesmoke; border: 1px solid lightgray; padding: 8px 10px; text-align: left; font-weight: bold; color: black;">
+    Setting
+   </th>
+   <th style="background-color: whitesmoke; border: 1px solid lightgray; padding: 8px 10px; text-align: left; font-weight: bold; color: black;">
+    Value
+   </th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Source field
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     u_sam_account_name
+    </code>
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Target field
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     user
+    </code>
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Coalesce
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Yes
+    </strong>
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Reference value
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     u_samaccountname
+    </code>
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Choice action
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     reject
+    </code>
+   </td>
+  </tr>
+ </tbody>
+</table>
+<p>
+ <strong>
+  Save
+ </strong>
+ the field map.
+</p>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ 6.3  -  Add Field Mapping: Group Reference
+</h3>
+<table class="table table-bordered table-striped" style="width: 100%; border-collapse: collapse; margin: 16px 0; border: 1px solid lightgray; font-size: 13px;">
+ <thead>
+  <tr>
+   <th style="background-color: whitesmoke; border: 1px solid lightgray; padding: 8px 10px; text-align: left; font-weight: bold; color: black;">
+    Setting
+   </th>
+   <th style="background-color: whitesmoke; border: 1px solid lightgray; padding: 8px 10px; text-align: left; font-weight: bold; color: black;">
+    Value
+   </th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Source field
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     u_capacity_planning
+    </code>
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Target field
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     group
+    </code>
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Coalesce
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Yes
+    </strong>
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Reference value
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     name
+    </code>
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Choice action
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     reject
+    </code>
+   </td>
+  </tr>
+ </tbody>
+</table>
+<p>
+ <strong>
+  Save
+ </strong>
+ the field map.
+</p>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ 6.4  -  Add onBefore Script for Delta Team Transfers
+</h3>
+<p>
+ Because both
+ <strong>
+  User
+ </strong>
+ and
+ <strong>
+  Group
+ </strong>
+ coalesce, ServiceNow natively matches existing memberships and leaves them untouched (preserving their original
+ <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+  sys_created_on
+ </code>
+ timestamps and history).
+</p>
+<p>
+ However, if an employee transfers to a
+ <strong>
+  new
+ </strong>
+ team, ServiceNow would find no match for
+ <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+  (User, New Group)
+ </code>
+ and insert the new membership - leaving their
+ <strong>
+  old
+ </strong>
+ team membership behind.
+</p>
+<p>
+ To ensure transferring employees are cleanly removed from their previous capacity team without affecting unchanged employees, add this lightweight
+ <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+  onBefore
+ </code>
+ script:
+</p>
+<ol style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+ <li style="margin-bottom: 4px;">
+  Scroll down to the
+  <strong>
+   Transform Scripts
+  </strong>
+  related list on Transform Map #3 (
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   RG Import - 3 - Create Memberships
+  </code>
+  ).
+ </li>
+ <li style="margin-bottom: 4px;">
+  Click
+  <strong>
+   New
+  </strong>
+  .
+ </li>
+ <li style="margin-bottom: 4px;">
+  Set
+  <strong>
+   When
+  </strong>
+  to
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   onBefore
+  </code>
+  .
+ </li>
+ <li style="margin-bottom: 4px;">
+  Paste the following script:
+ </li>
+</ol>
+<pre style="background-color: whitesmoke; border: 1px solid lightgray; border-radius: 4px; padding: 12px; overflow-x: auto; font-family: Consolas, Monaco, monospace; font-size: 13px; line-height: 1.45; margin: 14px 0;"><code class="language-javascript" style="font-family: Consolas, Monaco, monospace; color: black; background: transparent; padding: 0;">(function runTransformScript(source, map, log, target /*undefined onStart*/ ) {
+    var sam = (source.u_sam_account_name || '').toString().trim();
+    var newGroupName = (source.u_capacity_planning || '').toString().trim();
+
+    if (!sam || !newGroupName) {
+        return;
+    }
+
+    // Look up the user's current team from their Employee Profile
+    var prof = new GlideRecord('sn_employee_profile');
+    prof.addQuery('user.u_samaccountname', sam);
+    prof.query();
+
+    if (prof.next()) {
+        var oldGroup = prof.getValue('primary_resource_group');
+        var oldGroupName = prof.primary_resource_group.getDisplayValue();
+
+        // If they have an existing team and it differs from the incoming CSV team, remove the old membership
+        if (oldGroup &amp;&amp; oldGroupName != newGroupName) {
+            var oldMem = new GlideRecord('sys_user_grmember');
+            oldMem.addQuery('user', prof.getValue('user'));
+            oldMem.addQuery('group', oldGroup);
+            oldMem.deleteMultiple();
+            log.info('RG Import #3: Transferred user ' + sam + ' from old group ' + oldGroupName + ' to ' + newGroupName);
+        }
+    }
+})(source, map, log, target);
+</code></pre>
+<ol style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+ <li style="margin-bottom: 4px;">
+  Click
+  <strong>
+   Submit
+  </strong>
+  .
+ </li>
+</ol>
+<div class="alert alert-success" style="padding: 12px 16px; margin: 16px 0; border: 1px solid lightgray; border-left: 5px solid darkgreen; border-radius: 4px; background-color: honeydew; font-size: 13px;">
+ <strong style="color: darkgreen;">
+  Tip:
+ </strong>
+ <p>
+  <strong>
+   How this works during import:
+  </strong>
+  -
+  <strong>
+   Employee stays on the same team:
+  </strong>
+  The script detects the team has not changed and does nothing. ServiceNow's coalesce matches the existing
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   sys_user_grmember
+  </code>
+  record, keeping its original creation date and history 100% intact.
+-
+  <strong>
+   Employee transfers to a new team:
+  </strong>
+  The script deletes the user's old team membership, and the transform inserts the new one.
+-
+  <strong>
+   New employee joining for the first time:
+  </strong>
+  No old group exists, so the transform cleanly inserts the new membership.
+ </p>
+</div>
+<hr style="border: 0; border-top: 1px solid lightgray; margin: 24px 0;"/>
+<h2 style="font-size: 18px; font-weight: bold; border-bottom: 1px solid lightgray; padding-bottom: 6px; margin-top: 24px; margin-bottom: 12px; color: black;">
+ Step 7: Create Transform Map #4  -  Set Employee Profile
+</h2>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ 7.1  -  Create the Transform Map
+</h3>
+<ol style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+ <li style="margin-bottom: 4px;">
+  Navigate to
+  <strong>
+   System Import Sets → Transform Maps
+  </strong>
+ </li>
+ <li style="margin-bottom: 4px;">
+  Click
+  <strong>
+   New
+  </strong>
+ </li>
+ <li style="margin-bottom: 4px;">
+  Fill in:
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Name:
+  </strong>
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   RG Import - 4 - Set Employee Profile
+  </code>
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Source table:
+  </strong>
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   Primary_resource_group_updates
+  </code>
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Target table:
+  </strong>
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   sn_employee_profile
+  </code>
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Active:
+  </strong>
+  checked
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Run order:
+  </strong>
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   400
+  </code>
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Save
+  </strong>
+ </li>
+</ol>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ 7.2  -  Add Field Mapping: User Reference (Coalesce)
+</h3>
+<table class="table table-bordered table-striped" style="width: 100%; border-collapse: collapse; margin: 16px 0; border: 1px solid lightgray; font-size: 13px;">
+ <thead>
+  <tr>
+   <th style="background-color: whitesmoke; border: 1px solid lightgray; padding: 8px 10px; text-align: left; font-weight: bold; color: black;">
+    Setting
+   </th>
+   <th style="background-color: whitesmoke; border: 1px solid lightgray; padding: 8px 10px; text-align: left; font-weight: bold; color: black;">
+    Value
+   </th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Source field
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     u_sam_account_name
+    </code>
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Target field
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     user
+    </code>
+    (or whatever the user reference field is named on
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     sn_employee_profile
+    </code>
+    )
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Coalesce
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Yes
+    </strong>
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Reference value
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     u_samaccountname
+    </code>
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Choice action
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     reject
+    </code>
+   </td>
+  </tr>
+ </tbody>
+</table>
+<p>
+ <strong>
+  Save
+ </strong>
+ the field map.
+</p>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ 7.3  -  Add Field Mapping: Resource Group
+</h3>
+<table class="table table-bordered table-striped" style="width: 100%; border-collapse: collapse; margin: 16px 0; border: 1px solid lightgray; font-size: 13px;">
+ <thead>
+  <tr>
+   <th style="background-color: whitesmoke; border: 1px solid lightgray; padding: 8px 10px; text-align: left; font-weight: bold; color: black;">
+    Setting
+   </th>
+   <th style="background-color: whitesmoke; border: 1px solid lightgray; padding: 8px 10px; text-align: left; font-weight: bold; color: black;">
+    Value
+   </th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Source field
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     u_capacity_planning
+    </code>
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Target field
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     primary_resource_group
+    </code>
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Coalesce
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    No
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Reference value
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     name
+    </code>
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Choice action
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     reject
+    </code>
+   </td>
+  </tr>
+ </tbody>
+</table>
+<p>
+ <strong>
+  Save
+ </strong>
+ the field map.
+</p>
+<hr style="border: 0; border-top: 1px solid lightgray; margin: 24px 0;"/>
+<h2 style="font-size: 18px; font-weight: bold; border-bottom: 1px solid lightgray; padding-bottom: 6px; margin-top: 24px; margin-bottom: 12px; color: black;">
+ Step 8: Test the Full Pipeline
+</h2>
+<p>
+ Now that everything is built, test the pipeline using a small sample CSV containing three test cases:
+</p>
+<table class="table table-bordered table-striped" style="width: 100%; border-collapse: collapse; margin: 16px 0; border: 1px solid lightgray; font-size: 13px;">
+ <thead>
+  <tr>
+   <th style="background-color: whitesmoke; border: 1px solid lightgray; padding: 8px 10px; text-align: left; font-weight: bold; color: black;">
+    Test Case
+   </th>
+   <th style="background-color: whitesmoke; border: 1px solid lightgray; padding: 8px 10px; text-align: left; font-weight: bold; color: black;">
+    Sample Data Setup
+   </th>
+   <th style="background-color: whitesmoke; border: 1px solid lightgray; padding: 8px 10px; text-align: left; font-weight: bold; color: black;">
+    Expected Result
+   </th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     1. Unchanged User
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    User already belongs to "Network Operations" in their Employee Profile; CSV has "Network Operations"
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    Matched via coalesce.
+    <strong>
+     Existing
+     <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+      sys_user_grmember
+     </code>
+     record untouched;
+     <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+      sys_created_on
+     </code>
+     date preserved.
+    </strong>
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     2. Transferred User
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    User currently in "Network Operations" in Employee Profile; CSV has "Cloud Infrastructure"
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    Old membership in "Network Operations" is deleted; new membership in "Cloud Infrastructure" inserted; Profile updated.
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     3. New User
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    User has no capacity team assigned on Employee Profile; CSV has "Security Response"
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    New membership in "Security Response" inserted; Profile updated.
+   </td>
+  </tr>
+ </tbody>
+</table>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ 8.1  -  Run the Test Import
+</h3>
+<ol style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+ <li style="margin-bottom: 4px;">
+  Navigate to
+  <strong>
+   System Import Sets → Load Data
+  </strong>
+  .
+ </li>
+ <li style="margin-bottom: 4px;">
+  Select
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   Primary_resource_group_updates
+  </code>
+  , upload your test CSV, and submit.
+ </li>
+ <li style="margin-bottom: 4px;">
+  On the Import Set record (State =
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   Loaded
+  </code>
+  ), click
+  <strong>
+   Transform
+  </strong>
+  .
+ </li>
+ <li style="margin-bottom: 4px;">
+  Run all 5 maps in order.
+ </li>
+</ol>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ 8.2  -  Review Results by Transform Map
+</h3>
+<table class="table table-bordered table-striped" style="width: 100%; border-collapse: collapse; margin: 16px 0; border: 1px solid lightgray; font-size: 13px;">
+ <thead>
+  <tr>
+   <th style="background-color: whitesmoke; border: 1px solid lightgray; padding: 8px 10px; text-align: left; font-weight: bold; color: black;">
+    Transform Map
+   </th>
+   <th style="background-color: whitesmoke; border: 1px solid lightgray; padding: 8px 10px; text-align: left; font-weight: bold; color: black;">
+    Expected Result
+   </th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    #1 - Create Groups
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    New groups inserted, existing ones matched
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    #2 - Assign Role
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     pps_resource
+    </code>
+    role assigned to new groups
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    #2.5 - Update User Schedule/FTE
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    User schedule and FTE updated
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    #3 - Create Memberships
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    Transferred users moved (old group deleted, new group inserted); unchanged users matched via coalesce (untouched)
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    #4 - Set Employee Profile
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     primary_resource_group
+    </code>
+    updated on
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     sn_employee_profile
+    </code>
+   </td>
+  </tr>
+ </tbody>
+</table>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ 8.3  -  Verify in ServiceNow
+</h3>
+<ol style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Verify Unchanged User:
+  </strong>
+ </li>
+ <li style="margin-bottom: 4px;">
+  Open the user record in
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   sys_user
+  </code>
+  → go to the
+  <strong>
+   Groups
+  </strong>
+  related list.
+ </li>
+ <li style="margin-bottom: 4px;">
+  Confirm the user is in the group.
+ </li>
+ <li style="margin-bottom: 4px;">
+  Right-click the list header →
+  <strong>
+   Configure → List Layout
+  </strong>
+  and ensure
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   Created
+  </code>
+  (
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   sys_created_on
+  </code>
+  ) is visible. Confirm the timestamp was
+  <strong>
+   not
+  </strong>
+  reset to today's date.
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Verify Transferred User:
+  </strong>
+ </li>
+ <li style="margin-bottom: 4px;">
+  Confirm the user was removed from their old group and only belongs to their new capacity team.
+ </li>
+ <li style="margin-bottom: 4px;">
+  Check
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   sn_employee_profile
+  </code>
+  → confirm
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   primary_resource_group
+  </code>
+  shows the new group.
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Verify System Logs:
+  </strong>
+ </li>
+ <li style="margin-bottom: 4px;">
+  Navigate to
+  <strong>
+   System Logs → System Log → Application Logs
+  </strong>
+  (or All).
+ </li>
+ <li style="margin-bottom: 4px;">
+  Filter for messages starting with
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   RG Import #3:
+  </code>
+  . You will see explicit logs confirming any transferred users removed from their old groups.
+ </li>
+</ol>
+<hr style="border: 0; border-top: 1px solid lightgray; margin: 24px 0;"/>
+<h2 style="font-size: 18px; font-weight: bold; border-bottom: 1px solid lightgray; padding-bottom: 6px; margin-top: 24px; margin-bottom: 12px; color: black;">
+ Step 9: Set Up Monthly Automation
+</h2>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ 9.1  -  Create a Data Source
+</h3>
+<ol style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+ <li style="margin-bottom: 4px;">
+  Navigate to
+  <strong>
+   System Import Sets → Administration → Data Sources
+  </strong>
+ </li>
+ <li style="margin-bottom: 4px;">
+  Click
+  <strong>
+   New
+  </strong>
+ </li>
+ <li style="margin-bottom: 4px;">
+  Fill in:
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Name:
+  </strong>
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   Monthly Resource Group CSV
+  </code>
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Import set table:
+  </strong>
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   Primary_resource_group_updates
+  </code>
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Type:
+  </strong>
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   File
+  </code>
+  (or
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   SFTP
+  </code>
+  /
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   Attachment
+  </code>
+  depending on how the CSV will be delivered)
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Save
+  </strong>
+ </li>
+</ol>
+<div class="alert alert-success" style="padding: 12px 16px; margin: 16px 0; border: 1px solid lightgray; border-left: 5px solid darkgreen; border-radius: 4px; background-color: honeydew; font-size: 13px;">
+ <strong style="color: darkgreen;">
+  Tip:
+ </strong>
+ <p>
+  <strong>
+   File delivery options:
+  </strong>
+  -
+  <strong>
+   Manual upload:
+  </strong>
+  Someone uploads the CSV each month to the Data Source
+-
+  <strong>
+   SFTP/FTP:
+  </strong>
+  CSV dropped on a file server, Data Source pulls from there
+-
+  <strong>
+   Mid Server:
+  </strong>
+  File on an internal network share, fetched via Mid Server
+-
+  <strong>
+   Email attachment:
+  </strong>
+  Inbound email action to receive the CSV
+ </p>
+</div>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ 9.2  -  Create a Scheduled Import
+</h3>
+<ol style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+ <li style="margin-bottom: 4px;">
+  Navigate to
+  <strong>
+   System Import Sets → Administration → Scheduled Imports
+  </strong>
+ </li>
+ <li style="margin-bottom: 4px;">
+  Click
+  <strong>
+   New
+  </strong>
+ </li>
+ <li style="margin-bottom: 4px;">
+  Fill in:
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Name:
+  </strong>
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   Monthly Resource Group Import
+  </code>
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Data source:
+  </strong>
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   Monthly Resource Group CSV
+  </code>
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Run:
+  </strong>
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   Monthly
+  </code>
+  (e.g., 1st of each month at 2:00 AM)
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Run Transform:
+  </strong>
+  <strong>
+   Checked
+  </strong>
+  -  because delta cleanup is handled inside the transform maps, the scheduled import can transform immediately upon loading.
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Active:
+  </strong>
+  checked
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Save
+  </strong>
+ </li>
+</ol>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ 9.3  -  (Optional) Set Up Email Notifications
+</h3>
+<ol style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+ <li style="margin-bottom: 4px;">
+  Navigate to
+  <strong>
+   System Notification → Email → Notifications
+  </strong>
+ </li>
+ <li style="margin-bottom: 4px;">
+  Create a notification triggered on the Import Set table when State changes to
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   Complete
+  </code>
+  or
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   Error
+  </code>
+ </li>
+ <li style="margin-bottom: 4px;">
+  Send to the Resource Management team or import owner
+ </li>
+</ol>
+<hr style="border: 0; border-top: 1px solid lightgray; margin: 24px 0;"/>
+<h2 style="font-size: 18px; font-weight: bold; border-bottom: 1px solid lightgray; padding-bottom: 6px; margin-top: 24px; margin-bottom: 12px; color: black;">
+ Step 10: Activate
+</h2>
+<p>
+ Once testing is verified:
+</p>
+<ol style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Ensure Cleanup Flow is Deactivated
+  </strong>
+  -  In Flow Designer, verify
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   RG Import - Pre-Cleanup
+  </code>
+  is
+  <strong>
+   Inactive
+  </strong>
+  .
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Activate the Scheduled Import
+  </strong>
+  -  Ensure
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   Active
+  </code>
+  is checked on
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   Monthly Resource Group Import
+  </code>
+  .
+ </li>
+ <li style="margin-bottom: 4px;">
+  No external timing coordination is required.
+ </li>
+</ol>
+<hr style="border: 0; border-top: 1px solid lightgray; margin: 24px 0;"/>
+<h2 style="font-size: 18px; font-weight: bold; border-bottom: 1px solid lightgray; padding-bottom: 6px; margin-top: 24px; margin-bottom: 12px; color: black;">
+ Setup Complete
+</h2>
+<p>
+ You now have the following components ready:
+</p>
+<table class="table table-bordered table-striped" style="width: 100%; border-collapse: collapse; margin: 16px 0; border: 1px solid lightgray; font-size: 13px;">
+ <thead>
+  <tr>
+   <th style="background-color: whitesmoke; border: 1px solid lightgray; padding: 8px 10px; text-align: left; font-weight: bold; color: black;">
+    Component
+   </th>
+   <th style="background-color: whitesmoke; border: 1px solid lightgray; padding: 8px 10px; text-align: left; font-weight: bold; color: black;">
+    Type
+   </th>
+   <th style="background-color: whitesmoke; border: 1px solid lightgray; padding: 8px 10px; text-align: left; font-weight: bold; color: black;">
+    Purpose
+   </th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     RG Import - Pre-Cleanup
+    </code>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    Flow / Fix Script
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Deactivated / Retired
+    </strong>
+    (Delta cleanup now handled dynamically in Map #3)
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     Primary_resource_group_updates
+    </code>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    Staging Table
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    Holds CSV data
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     RG Import - 1 - Create Groups
+    </code>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    Transform Map
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    Creates missing
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     sys_user_group
+    </code>
+    records
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     RG Import - 2 - Assign Role
+    </code>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    Transform Map
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    Assigns
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     pps_resource
+    </code>
+    role to groups
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     RG Import - 2.5 - Update User Schedule and FTE
+    </code>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    Transform Map
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    Automatically assigns default schedules and user-level FTE overrides
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     RG Import - 3 - Create Memberships
+    </code>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    Transform Map
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    Manages memberships: preserves history for unchanged users, cleans up old group for transfers
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     RG Import - 4 - Set Employee Profile
+    </code>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    Transform Map
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    Sets
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     primary_resource_group
+    </code>
+    on
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     sn_employee_profile
+    </code>
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     Monthly Resource Group CSV
+    </code>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    Data Source
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    Receives the monthly CSV file
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     Monthly Resource Group Import
+    </code>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    Scheduled Import
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    Automatically loads CSV and runs the delta transforms
+   </td>
+  </tr>
+ </tbody>
+</table>
+<p>
+ <strong>
+  Next:
+ </strong>
+ Refer to the
+ <strong>
+  Operations Guide
+ </strong>
+ for monthly usage instructions.
+</p>
+<hr style="border: 0; border-top: 1px solid lightgray; margin: 24px 0;"/>
+<h2 style="font-size: 18px; font-weight: bold; border-bottom: 1px solid lightgray; padding-bottom: 6px; margin-top: 24px; margin-bottom: 12px; color: black;">
+ Important Warnings
+</h2>
+<div class="alert alert-danger" style="padding: 12px 16px; margin: 16px 0; border: 1px solid lightgray; border-left: 5px solid crimson; border-radius: 4px; background-color: mistyrose; font-size: 13px;">
+ <strong style="color: crimson;">
+  Warning:
+ </strong>
+ <p>
+  <strong>
+   Coalesce is case-sensitive.
+  </strong>
+  If the CSV has
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   "Network Ops"
+  </code>
+  but ServiceNow has
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   "network ops"
+  </code>
+  , a duplicate group will be created. Always normalize CSV casing before import.
+ </p>
+</div>
+<div class="alert alert-info" style="padding: 12px 16px; margin: 16px 0; border: 1px solid lightgray; border-left: 5px solid darkblue; border-radius: 4px; background-color: aliceblue; font-size: 13px;">
+ <strong style="color: darkblue;">
+  Note:
+ </strong>
+ <p>
+  <strong>
+   Employees Absent from CSV:
+  </strong>
+  The delta transform updates employees listed in the CSV. If an employee departs or is completely removed from the monthly CSV without being placed in another team, their existing group membership remains until they are offboarded or updated manually.
+ </p>
+</div>
+
+
+</div>

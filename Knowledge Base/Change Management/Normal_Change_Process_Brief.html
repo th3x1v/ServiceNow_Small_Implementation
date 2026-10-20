@@ -1,0 +1,505 @@
+<!-- 
+  ServiceNow Knowledge Base Article: KB - Normal Change Process Brief
+  Category: Change Management
+  Instructions:
+  1. Open ServiceNow -> Knowledge -> Articles -> Create New (or open kb_knowledge form).
+  2. In the "Article Body" (text field) TinyMCE toolbar, click the Source Code icon (<>).
+  3. Paste this entire HTML block into the source window and click OK.
+  4. Fill in Short Description: "KB - Normal Change Process Brief"
+  5. Select Knowledge Base and Category: "Change Management"
+  6. Click Save or Publish.
+-->
+<div class="sn-kb-article" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 14px; line-height: 1.6; color: black; max-width: 100%;">
+  
+  <!-- KB Metadata Header Callout -->
+  <div class="alert alert-info" style="padding: 12px 16px; margin-bottom: 20px; border: 1px solid lightgray; border-left: 5px solid darkblue; border-radius: 4px; background-color: aliceblue; font-size: 13px;">
+    <div style="font-weight: bold; font-size: 15px; margin-bottom: 4px; color: darkblue;">Knowledge Base Article Details</div>
+    <div><strong>Title:</strong> KB - Normal Change Process Brief</div>
+    <div><strong>Category:</strong> Change Management</div>
+    <div><strong>Audience:</strong> ServiceNow Administrators, Change Managers, IT Operations</div>
+  </div>
+
+  <!-- Article Body Content -->
+<h1 style="font-size: 22px; font-weight: bold; border-bottom: 2px solid lightgray; padding-bottom: 8px; margin-top: 16px; margin-bottom: 16px; color: black;">
+ Normal Change Management: End-to-End Process Brief
+</h1>
+<p>
+ <strong>
+  Zero-Meeting Consensus &amp; CAB by Exception
+ </strong>
+</p>
+<hr style="border: 0; border-top: 1px solid lightgray; margin: 24px 0;"/>
+<h2 style="font-size: 18px; font-weight: bold; border-bottom: 1px solid lightgray; padding-bottom: 6px; margin-top: 24px; margin-bottom: 12px; color: black;">
+ Executive Summary
+</h2>
+<p>
+ This document outlines the redesigned
+ <strong>
+  Normal Change Management Workflow
+ </strong>
+ . The core objectives of this process are:
+ <br/>
+ 1.
+ <strong>
+  Eliminate Team Approval Fatigue:
+ </strong>
+ Route technical approvals directly to an engineer's supervisor rather than blasting the entire assignment group.
+ <br/>
+ 2.
+ <strong>
+  "CAB by Exception" (Zero-Meeting Default):
+ </strong>
+ Fast-track uncontested normal changes asynchronously via 1-click email approvals.
+ <br/>
+ 3.
+ <strong>
+  Focused Live Review:
+ </strong>
+ Hold live Microsoft Teams meetings
+ <em>
+  only
+ </em>
+ when a CAB member raises an objection ("No" vote).
+ <br/>
+ 4.
+ <strong>
+  Transparent Audit Trail:
+ </strong>
+ Log all in-meeting vote updates and justifications permanently for compliance.
+</p>
+<hr style="border: 0; border-top: 1px solid lightgray; margin: 24px 0;"/>
+<h2 style="font-size: 18px; font-weight: bold; border-bottom: 1px solid lightgray; padding-bottom: 6px; margin-top: 24px; margin-bottom: 12px; color: black;">
+ High-Level Process Flow
+</h2>
+<pre style="background-color: whitesmoke; border: 1px solid lightgray; border-radius: 4px; padding: 12px; overflow-x: auto; font-family: Consolas, Monaco, monospace; font-size: 13px; line-height: 1.45; margin: 14px 0;"><code class="language-mermaid" style="font-family: Consolas, Monaco, monospace; color: black; background: transparent; padding: 0;">flowchart TD
+    A[1. New: Change Created] --&gt;|Requester Submits| B[2. Assess: Supervisor Approval]
+
+    subgraph Assess_Stage [Phase 1: Supervisor Assessment]
+        B --&gt; C{Assigned To&lt;br/&gt;Has Manager?}
+        C --&gt;|Yes| D[Route to Direct Supervisor]
+        C --&gt;|No| E[Route to Fallback Queue]
+        D --&gt;|Approved| F[3. Authorize: Asynchronous CAB]
+        E --&gt;|Approved| F
+        D --&gt;|Rejected| A
+    end
+
+    subgraph Authorize_Stage [Phase 2: CAB Authorization]
+        F --&gt; G[Dispatch 1-Click Email Approvals to CAB]
+        G --&gt; H{Any Objections&lt;br/&gt;Raised?}
+
+        %% Happy Path
+        H --&gt;|All 'Yes' Votes&lt;br/&gt;100% Consensus| I[4. Scheduled: Change Approved&lt;br/&gt; ZERO MEETINGS ]
+
+        %% Exception Path
+        H --&gt;|Single 'No' Vote| J[ EXCEPTION PATH &lt;br/&gt;Hold in Authorize &amp; Flag CAB Required]
+        J --&gt; K[Auto-Dispatch Meeting Invite&lt;br/&gt;for Standard Weekly Teams Slot]
+        K --&gt; L[Discuss Concerns During Live Teams Call]
+        L --&gt; M{Concerns&lt;br/&gt;Resolved?}
+        M --&gt;|Yes| N[Approver Clicks 'Change Vote to Approve'&lt;br/&gt;Mandatory Reason Logged to Audit Trail]
+        N --&gt; I
+        M --&gt;|No| O[Change Cancelled or Sent Back to Assess]
+    end
+
+    subgraph Execution [Phase 3: Implementation]
+        I --&gt; P[5. Implement: Work Executed in Planned Window]
+        P --&gt; Q[6. Review: Post-Implementation Review]
+        Q --&gt; R[7. Closed]
+    end
+
+    classDef happyPath fill:honeydew,stroke:darkgreen,stroke-width:2px,color:darkgreen;
+    classDef exceptionPath fill:lightyellow,stroke:darkgoldenrod,stroke-width:2px,color:darkgoldenrod;
+    classDef normalStage fill:whitesmoke,stroke:gray,stroke-width:1px,color:black;
+
+    class I happyPath;
+    class J,K,L,M,N exceptionPath;
+    class A,B,D,E,F,G,P,Q,R normalStage;
+</code></pre>
+<hr style="border: 0; border-top: 1px solid lightgray; margin: 24px 0;"/>
+<h2 style="font-size: 18px; font-weight: bold; border-bottom: 1px solid lightgray; padding-bottom: 6px; margin-top: 24px; margin-bottom: 12px; color: black;">
+ The 4 Stages in Detail
+</h2>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ Stage 1: Submission &amp; Planning (
+ <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+  New
+ </code>
+ )
+</h3>
+<ul style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Who:
+  </strong>
+  Change Requester.
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   What Happens:
+  </strong>
+ </li>
+ <li style="margin-bottom: 4px;">
+  The requester inputs the change description, planned implementation window, backout plan, and risk questionnaire.
+ </li>
+ <li style="margin-bottom: 4px;">
+  The requester clicks
+  <strong>
+   Request Approval
+  </strong>
+  .
+ </li>
+ <li style="margin-bottom: 4px;">
+  The change transitions to
+  <strong>
+   Assess
+  </strong>
+  .
+ </li>
+</ul>
+<hr style="border: 0; border-top: 1px solid lightgray; margin: 24px 0;"/>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ Stage 2: Technical &amp; Managerial Assessment (
+ <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+  Assess
+ </code>
+ )
+</h3>
+<ul style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Who:
+  </strong>
+  Direct Supervisor (
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   assigned_to.manager
+  </code>
+  ).
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Why this is better:
+  </strong>
+ </li>
+ <li style="margin-bottom: 4px;">
+  In the past, the entire assignment group received approval requests, causing confusion and bystander apathy.
+ </li>
+ <li style="margin-bottom: 4px;">
+  Now, ServiceNow checks the user profile of the technician assigned to do the work and generates
+  <strong>
+   exactly one approval
+  </strong>
+  for their direct supervisor.
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Fallback Safety:
+  </strong>
+  If a technician's manager field is blank, the change routes safely to a designated fallback lead queue so it is never lost.
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Outcome:
+  </strong>
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Approved:
+  </strong>
+  Automatically transitions to
+  <strong>
+   Authorize
+  </strong>
+  .
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Rejected:
+  </strong>
+  Returns to
+  <strong>
+   New
+  </strong>
+  with supervisor feedback for revision.
+ </li>
+</ul>
+<hr style="border: 0; border-top: 1px solid lightgray; margin: 24px 0;"/>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ Stage 3: Asynchronous CAB Review (
+ <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+  Authorize
+ </code>
+ )
+</h3>
+<ul style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Who:
+  </strong>
+  CAB Approval Group (
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   &lt;CAB_APPROVAL_GROUP&gt;
+  </code>
+  ).
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Timing:
+  </strong>
+  Evaluated automatically for changes scheduled within the upcoming window (e.g. between last week and next week).
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   How Voting Works:
+  </strong>
+ </li>
+ <li style="margin-bottom: 4px;">
+  Every CAB member receives an approval notification with change details and two 1-click buttons in their email:
+  <strong>
+   Approve
+  </strong>
+  and
+  <strong>
+   Reject
+  </strong>
+  .
+ </li>
+ <li style="margin-bottom: 4px;">
+  Members vote directly from Outlook without logging into ServiceNow.
+ </li>
+</ul>
+<h4 style="font-size: 14px; font-weight: bold; margin-top: 14px; margin-bottom: 6px; color: black;">
+ Path A: The Consensus Path (Zero Meetings)
+</h4>
+<ul style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+ <li style="margin-bottom: 4px;">
+  If
+  <strong>
+   all members approve
+  </strong>
+  , 100% quorum is reached asynchronously.
+ </li>
+ <li style="margin-bottom: 4px;">
+  The change
+  <strong>
+   immediately advances to
+   <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+    Scheduled
+   </code>
+  </strong>
+  .
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Result:
+  </strong>
+  No meeting is held, no agenda is created, and no time is wasted reviewing routine, uncontested changes.
+ </li>
+</ul>
+<h4 style="font-size: 14px; font-weight: bold; margin-top: 14px; margin-bottom: 6px; color: black;">
+ Path B: The Exception Path (Single "No" Vote)
+</h4>
+<ul style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+ <li style="margin-bottom: 4px;">
+  If
+  <strong>
+   any single CAB member clicks Reject
+  </strong>
+  :
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Change Remains in
+   <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+    Authorize
+   </code>
+   :
+  </strong>
+  It is not cancelled or kicked back to square one.
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   CAB Flagged:
+  </strong>
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   CAB Required
+  </code>
+  is set to
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   true
+  </code>
+  .
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Automated Escalation Email:
+  </strong>
+  An email is sent to all CAB members, the requester, and the technician with:
+  <ul style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+   <li style="margin-bottom: 4px;">
+    Details of the objection raised.
+   </li>
+   <li style="margin-bottom: 4px;">
+    Meeting details and Teams link for the
+    <strong>
+     regular weekly CAB time slot
+    </strong>
+    .
+   </li>
+   <li style="margin-bottom: 4px;">
+    Link to the Change Request and voting instructions.
+   </li>
+  </ul>
+ </li>
+</ul>
+<hr style="border: 0; border-top: 1px solid lightgray; margin: 24px 0;"/>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ Stage 4: Live Teams Review &amp; In-Meeting Vote Overturning
+</h3>
+<ul style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Where:
+  </strong>
+  Standard Microsoft Teams Meeting (No complex CAB Workbench required).
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Agenda:
+  </strong>
+  Only contested changes that received a "No" vote are discussed.
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   In-Meeting Resolution:
+  </strong>
+ </li>
+ <li style="margin-bottom: 4px;">
+  The change owner explains the plan and addresses the specific concern raised by the dissenter.
+ </li>
+ <li style="margin-bottom: 4px;">
+  Once satisfied, the dissenter opens their approval record and clicks
+  <strong>
+   Change Vote to Approve
+  </strong>
+  .
+ </li>
+ <li style="margin-bottom: 4px;">
+  A prompt requires a brief
+  <strong>
+   Justification Comment
+  </strong>
+  (e.g.,
+  <em>
+   "Rollback plan clarified during Teams CAB call"
+  </em>
+  ).
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Airtight Audit Trail:
+  </strong>
+  ServiceNow stamps an immutable entry in the Change Request's permanent Work Notes capturing the approver's name, previous vote, new vote, timestamp, and justification.
+ </li>
+ <li style="margin-bottom: 4px;">
+  As soon as all votes are green, ServiceNow
+  <strong>
+   automatically advances the change to
+   <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+    Scheduled
+   </code>
+  </strong>
+  .
+ </li>
+</ul>
+<hr style="border: 0; border-top: 1px solid lightgray; margin: 24px 0;"/>
+<h2 style="font-size: 18px; font-weight: bold; border-bottom: 1px solid lightgray; padding-bottom: 6px; margin-top: 24px; margin-bottom: 12px; color: black;">
+ Key Benefits Matrix
+</h2>
+<table class="table table-bordered table-striped" style="width: 100%; border-collapse: collapse; margin: 16px 0; border: 1px solid lightgray; font-size: 13px;">
+ <thead>
+  <tr>
+   <th style="background-color: whitesmoke; border: 1px solid lightgray; padding: 8px 10px; text-align: left; font-weight: bold; color: black;">
+    Area
+   </th>
+   <th style="background-color: whitesmoke; border: 1px solid lightgray; padding: 8px 10px; text-align: left; font-weight: bold; color: black;">
+    Before
+   </th>
+   <th style="background-color: whitesmoke; border: 1px solid lightgray; padding: 8px 10px; text-align: left; font-weight: bold; color: black;">
+    With New Process
+   </th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Assess Approval
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    Entire assignment group flooded with requests
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    Exactly 1 request sent to direct supervisor
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     CAB Meetings
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    Weekly 60-minute meetings reviewing dozens of uncontested changes
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    Zero routine meetings; brief live syncs
+    <em>
+     only
+    </em>
+    for contested changes
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Voting Method
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    Logging into ServiceNow or waiting for live call roll-call
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    1-Click email voting or Service Portal card
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Handling Objections
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    Clunky manual rescheduling or outright rejection
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    Automatic escalation to standard Teams slot; vote can be overturned with audit log
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Compliance &amp; Audit
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    Scattered email threads or chat notes
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    100% of votes, comments, and in-meeting reversals stamped directly in the Change activity stream
+   </td>
+  </tr>
+ </tbody>
+</table>
+
+
+</div>

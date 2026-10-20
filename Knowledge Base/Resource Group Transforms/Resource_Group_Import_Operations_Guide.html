@@ -1,0 +1,1271 @@
+<!-- 
+  ServiceNow Knowledge Base Article: KB - Resource Group Import Operations Guide
+  Category: Resource Group Transforms
+  Instructions:
+  1. Open ServiceNow -> Knowledge -> Articles -> Create New (or open kb_knowledge form).
+  2. In the "Article Body" (text field) TinyMCE toolbar, click the Source Code icon (<>).
+  3. Paste this entire HTML block into the source window and click OK.
+  4. Fill in Short Description: "KB - Resource Group Import Operations Guide"
+  5. Select Knowledge Base and Category: "Resource Group Transforms"
+  6. Click Save or Publish.
+-->
+<div class="sn-kb-article" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 14px; line-height: 1.6; color: black; max-width: 100%;">
+  
+  <!-- KB Metadata Header Callout -->
+  <div class="alert alert-info" style="padding: 12px 16px; margin-bottom: 20px; border: 1px solid lightgray; border-left: 5px solid darkblue; border-radius: 4px; background-color: aliceblue; font-size: 13px;">
+    <div style="font-weight: bold; font-size: 15px; margin-bottom: 4px; color: darkblue;">Knowledge Base Article Details</div>
+    <div><strong>Title:</strong> KB - Resource Group Import Operations Guide</div>
+    <div><strong>Category:</strong> Resource Group Transforms</div>
+    <div><strong>Audience:</strong> ServiceNow Administrators, Change Managers, IT Operations</div>
+  </div>
+
+  <!-- Article Body Content -->
+<h1 style="font-size: 22px; font-weight: bold; border-bottom: 2px solid lightgray; padding-bottom: 8px; margin-top: 16px; margin-bottom: 16px; color: black;">
+ Resource Group Import  -  Monthly Operations Guide
+</h1>
+<p>
+ This document covers
+ <strong>
+  how to use
+ </strong>
+ the Resource Group Import framework each month. For the one-time infrastructure setup, see the
+ <strong>
+  Setup Guide
+ </strong>
+ .
+</p>
+<hr style="border: 0; border-top: 1px solid lightgray; margin: 24px 0;"/>
+<h2 style="font-size: 18px; font-weight: bold; border-bottom: 1px solid lightgray; padding-bottom: 6px; margin-top: 24px; margin-bottom: 12px; color: black;">
+ Quick Reference
+</h2>
+<table class="table table-bordered table-striped" style="width: 100%; border-collapse: collapse; margin: 16px 0; border: 1px solid lightgray; font-size: 13px;">
+ <thead>
+  <tr>
+   <th style="background-color: whitesmoke; border: 1px solid lightgray; padding: 8px 10px; text-align: left; font-weight: bold; color: black;">
+    Item
+   </th>
+   <th style="background-color: whitesmoke; border: 1px solid lightgray; padding: 8px 10px; text-align: left; font-weight: bold; color: black;">
+    Value
+   </th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Delta Cleanup
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    Dynamic cleanup in Transform Map #3  -  removes old group membership only when employee transfers teams
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Scheduled Import
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     Monthly Resource Group Import
+    </code>
+    -  loads CSV data and executes delta transforms automatically
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Staging table
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     Primary_resource_group_updates
+    </code>
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     CSV columns
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    SAM Account Name, Capacity Team, Role, Schedule, FTE Hours
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     User lookup
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     u_samaccountname
+    </code>
+    on
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     sys_user
+    </code>
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Employee Profile table
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     sn_employee_profile
+    </code>
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Resource group field
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     primary_resource_group
+    </code>
+   </td>
+  </tr>
+ </tbody>
+</table>
+<hr style="border: 0; border-top: 1px solid lightgray; margin: 24px 0;"/>
+<h2 style="font-size: 18px; font-weight: bold; border-bottom: 1px solid lightgray; padding-bottom: 6px; margin-top: 24px; margin-bottom: 12px; color: black;">
+ Monthly Checklist
+</h2>
+<p>
+ Print or copy this checklist each month:
+</p>
+<pre style="background-color: whitesmoke; border: 1px solid lightgray; border-radius: 4px; padding: 12px; overflow-x: auto; font-family: Consolas, Monaco, monospace; font-size: 13px; line-height: 1.45; margin: 14px 0;"><code style="font-family: Consolas, Monaco, monospace; color: black; background: transparent; padding: 0;">□ 1. CSV received from source
+□ 2. CSV validated (see Section 1)
+□ 3. CSV uploaded to Data Source (see Section 2)
+□ 4. Import completed  -  transform results reviewed (see Section 3 &amp; 4)
+□ 5. Errors investigated and remediated (see Section 5)
+□ 6. Spot-check 3 - 5 users in ServiceNow (see Section 6)
+□ 7. Verified in SPM Resource Management views (see Section 6)
+□ 8. Generate Resource Capacity job run manually (see Section 7)
+□ Done  -  results communicated to stakeholders
+</code></pre>
+<hr style="border: 0; border-top: 1px solid lightgray; margin: 24px 0;"/>
+<h2 style="font-size: 18px; font-weight: bold; border-bottom: 1px solid lightgray; padding-bottom: 6px; margin-top: 24px; margin-bottom: 12px; color: black;">
+ 1. Validate the CSV
+</h2>
+<p>
+ Before uploading, check the CSV for data quality issues.
+</p>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ Required Format
+</h3>
+<p>
+ The CSV must have the standard columns (at minimum SAM Account Name and Capacity Team; plus Role, Schedule, and FTE Hours if using schedules):
+</p>
+<pre style="background-color: whitesmoke; border: 1px solid lightgray; border-radius: 4px; padding: 12px; overflow-x: auto; font-family: Consolas, Monaco, monospace; font-size: 13px; line-height: 1.45; margin: 14px 0;"><code class="language-csv" style="font-family: Consolas, Monaco, monospace; color: black; background: transparent; padding: 0;">SAM Account Name,Capacity Team,Role,Schedule,FTE Hours
+jsmith,Network Operations,pps_resource,8-5 weekdays,8
+jdoe,Cloud Infrastructure,pps_resource,8-5 weekdays,8
+mbrown,Security Response,pps_resource,8-5 weekdays,8
+...
+</code></pre>
+<div class="alert alert-info" style="padding: 12px 16px; margin: 16px 0; border: 1px solid lightgray; border-left: 5px solid darkblue; border-radius: 4px; background-color: aliceblue; font-size: 13px;">
+ <strong style="color: darkblue;">
+  Note:
+ </strong>
+ <p>
+  The
+  <strong>
+   Role
+  </strong>
+  column must contain
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   pps_resource
+  </code>
+  in every row. This is used by Transform Map #2 to assign the role to each group. In Excel, type it once and fill down all rows.
+ </p>
+</div>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ Validation Checks
+</h3>
+<table class="table table-bordered table-striped" style="width: 100%; border-collapse: collapse; margin: 16px 0; border: 1px solid lightgray; font-size: 13px;">
+ <thead>
+  <tr>
+   <th style="background-color: whitesmoke; border: 1px solid lightgray; padding: 8px 10px; text-align: left; font-weight: bold; color: black;">
+    Check
+   </th>
+   <th style="background-color: whitesmoke; border: 1px solid lightgray; padding: 8px 10px; text-align: left; font-weight: bold; color: black;">
+    Why It Matters
+   </th>
+   <th style="background-color: whitesmoke; border: 1px solid lightgray; padding: 8px 10px; text-align: left; font-weight: bold; color: black;">
+    How to Fix
+   </th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     No blank values
+    </strong>
+    in key columns
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    Blank SAM Account Names → errors. Blank Capacity Teams → unnamed groups created.
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    Remove or fill in blank rows before upload
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     No leading/trailing whitespace
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     " Network Ops"
+    </code>
+    and
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     "Network Ops"
+    </code>
+    would create two separate groups
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    Trim all values in Excel or your CSV editor
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Consistent casing
+    </strong>
+    on Capacity Team names
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     "Network Ops"
+    </code>
+    vs
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     "network ops"
+    </code>
+    creates duplicate groups (coalesce is case-sensitive)
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    Normalize to a consistent case (e.g., Title Case)
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     SAM Account Names are valid
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    Typos or deprovisioned accounts will fail during import
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    Spot-check 5 - 10 names against ServiceNow if source data is unreliable
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     File encoding is UTF-8
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    Non-UTF-8 encoding can corrupt special characters
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    Save as UTF-8 CSV from Excel:
+    <strong>
+     File → Save As → CSV UTF-8
+    </strong>
+   </td>
+  </tr>
+ </tbody>
+</table>
+<div class="alert alert-success" style="padding: 12px 16px; margin: 16px 0; border: 1px solid lightgray; border-left: 5px solid darkgreen; border-radius: 4px; background-color: honeydew; font-size: 13px;">
+ <strong style="color: darkgreen;">
+  Tip:
+ </strong>
+ <p>
+  <strong>
+   Quick validation in Excel:
+  </strong>
+  1. Sort the Capacity Team column → visually scan for near-duplicates and case mismatches
+2. Filter for blanks in both columns
+3. Use
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   =TRIM()
+  </code>
+  to clean whitespace
+4. Use
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   =PROPER()
+  </code>
+  to normalize to Title Case
+ </p>
+</div>
+<hr style="border: 0; border-top: 1px solid lightgray; margin: 24px 0;"/>
+<h2 style="font-size: 18px; font-weight: bold; border-bottom: 1px solid lightgray; padding-bottom: 6px; margin-top: 24px; margin-bottom: 12px; color: black;">
+ 2. Upload the CSV
+</h2>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ If Using Manual Upload
+</h3>
+<ol style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+ <li style="margin-bottom: 4px;">
+  Navigate to
+  <strong>
+   System Import Sets → Administration → Data Sources
+  </strong>
+ </li>
+ <li style="margin-bottom: 4px;">
+  Open
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   Monthly Resource Group CSV
+  </code>
+ </li>
+ <li style="margin-bottom: 4px;">
+  Upload the new CSV file as an attachment (or replace the existing file)
+ </li>
+ <li style="margin-bottom: 4px;">
+  The Scheduled Import will pick it up at the scheduled time
+ </li>
+</ol>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ If Using SFTP/FTP
+</h3>
+<ol style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+ <li style="margin-bottom: 4px;">
+  Drop the CSV file to the configured SFTP location
+ </li>
+ <li style="margin-bottom: 4px;">
+  Ensure the filename matches what the Data Source expects
+ </li>
+ <li style="margin-bottom: 4px;">
+  The Data Source will pull the file at the scheduled time
+ </li>
+</ol>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ If Running Manually (Not Waiting for Schedule)
+</h3>
+<ol style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+ <li style="margin-bottom: 4px;">
+  Navigate to
+  <strong>
+   System Import Sets → Load Data
+  </strong>
+ </li>
+ <li style="margin-bottom: 4px;">
+  Select the existing table:
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   Primary_resource_group_updates
+  </code>
+ </li>
+ <li style="margin-bottom: 4px;">
+  Upload the CSV and submit
+ </li>
+ <li style="margin-bottom: 4px;">
+  On the resulting screen or Import Set, click
+  <strong>
+   Transform
+  </strong>
+  to run the 5 transform maps
+ </li>
+</ol>
+<hr style="border: 0; border-top: 1px solid lightgray; margin: 24px 0;"/>
+<h2 style="font-size: 18px; font-weight: bold; border-bottom: 1px solid lightgray; padding-bottom: 6px; margin-top: 24px; margin-bottom: 12px; color: black;">
+ 3. Understanding Delta Updates (No Blanket Wipe)
+</h2>
+<p>
+ In earlier versions of this process, a pre-cleanup step wiped all memberships from
+ <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+  pps_resource
+ </code>
+ groups.
+ <strong>
+  That blanket wipe has been retired to preserve historical data.
+ </strong>
+</p>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ How Delta Updates Work:
+</h3>
+<ol style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Unchanged Employees (Same Team):
+  </strong>
+ </li>
+ <li style="margin-bottom: 4px;">
+  The CSV group matches the employee's current
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   primary_resource_group
+  </code>
+  on their
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   sn_employee_profile
+  </code>
+  .
+ </li>
+ <li style="margin-bottom: 4px;">
+  ServiceNow's coalesce matches their existing
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   sys_user_grmember
+  </code>
+  record.
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   No records are deleted or re-inserted.
+  </strong>
+  Their original group membership creation date (
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   sys_created_on
+  </code>
+  ) and historical audit trail remain completely untouched.
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Transferring Employees (New Team):
+  </strong>
+ </li>
+ <li style="margin-bottom: 4px;">
+  The CSV group differs from their current
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   primary_resource_group
+  </code>
+  on
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   sn_employee_profile
+  </code>
+  .
+ </li>
+ <li style="margin-bottom: 4px;">
+  The
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   onBefore
+  </code>
+  script in Transform Map #3 removes the employee from their
+  <strong>
+   old
+  </strong>
+  group.
+ </li>
+ <li style="margin-bottom: 4px;">
+  Transform Map #3 inserts the employee into their
+  <strong>
+   new
+  </strong>
+  group.
+ </li>
+ <li style="margin-bottom: 4px;">
+  Transform Map #4 updates their
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   sn_employee_profile.primary_resource_group
+  </code>
+  .
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   New Employees:
+  </strong>
+ </li>
+ <li style="margin-bottom: 4px;">
+  The employee has no prior capacity team on
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   sn_employee_profile
+  </code>
+  .
+ </li>
+ <li style="margin-bottom: 4px;">
+  Transform Map #3 inserts them into the new group, and Transform Map #4 sets their profile.
+ </li>
+</ol>
+<hr style="border: 0; border-top: 1px solid lightgray; margin: 24px 0;"/>
+<h2 style="font-size: 18px; font-weight: bold; border-bottom: 1px solid lightgray; padding-bottom: 6px; margin-top: 24px; margin-bottom: 12px; color: black;">
+ 4. Monitor the Import
+</h2>
+<p>
+ If running manually or inspecting a scheduled run:
+</p>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ Manual Trigger
+</h3>
+<ol style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+ <li style="margin-bottom: 4px;">
+  Navigate to
+  <strong>
+   System Import Sets → Import Sets
+  </strong>
+ </li>
+ <li style="margin-bottom: 4px;">
+  Open the Import Set (State =
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   Loaded
+  </code>
+  )
+ </li>
+ <li style="margin-bottom: 4px;">
+  Click
+  <strong>
+   Transform
+  </strong>
+ </li>
+</ol>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ Review Transform Results
+</h3>
+<p>
+ After completion, ServiceNow shows a summary for each Transform Map. Here's what to expect:
+</p>
+<h4 style="font-size: 14px; font-weight: bold; margin-top: 14px; margin-bottom: 6px; color: black;">
+ Transform Map #1  -  Create Groups
+</h4>
+<pre style="background-color: whitesmoke; border: 1px solid lightgray; border-radius: 4px; padding: 12px; overflow-x: auto; font-family: Consolas, Monaco, monospace; font-size: 13px; line-height: 1.45; margin: 14px 0;"><code style="font-family: Consolas, Monaco, monospace; color: black; background: transparent; padding: 0;">Inserts: [small number  -  only new groups]
+Updates: [most rows  -  existing groups matched]
+Errors:  0
+</code></pre>
+<ul style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+ <li style="margin-bottom: 4px;">
+  <strong>
+   First import:
+  </strong>
+  All groups will be inserts
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Subsequent months:
+  </strong>
+  Mostly updates (skips), with inserts only for brand-new capacity teams
+ </li>
+</ul>
+<h4 style="font-size: 14px; font-weight: bold; margin-top: 14px; margin-bottom: 6px; color: black;">
+ Transform Map #2  -  Assign Role
+</h4>
+<pre style="background-color: whitesmoke; border: 1px solid lightgray; border-radius: 4px; padding: 12px; overflow-x: auto; font-family: Consolas, Monaco, monospace; font-size: 13px; line-height: 1.45; margin: 14px 0;"><code style="font-family: Consolas, Monaco, monospace; color: black; background: transparent; padding: 0;">Inserts: [same as #1 inserts  -  new groups need roles]
+Updates: [same as #1 updates  -  role already assigned]
+Errors:  0
+</code></pre>
+<ul style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+ <li style="margin-bottom: 4px;">
+  Should mirror Transform Map #1 counts exactly
+ </li>
+</ul>
+<h4 style="font-size: 14px; font-weight: bold; margin-top: 14px; margin-bottom: 6px; color: black;">
+ Transform Map #3  -  Create Memberships
+</h4>
+<pre style="background-color: whitesmoke; border: 1px solid lightgray; border-radius: 4px; padding: 12px; overflow-x: auto; font-family: Consolas, Monaco, monospace; font-size: 13px; line-height: 1.45; margin: 14px 0;"><code style="font-family: Consolas, Monaco, monospace; color: black; background: transparent; padding: 0;">Inserts: [small number  -  only new employees and employees who transferred to a new team]
+Updates: [most rows  -  unchanged employees matched via coalesce]
+Errors:  [users not found by u_samaccountname]
+</code></pre>
+<ul style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Unchanged employees:
+  </strong>
+  Show as
+  <strong>
+   Updates
+  </strong>
+  because their existing membership record was matched via coalesce and left untouched, preserving their original creation timestamp.
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Transferred &amp; new employees:
+  </strong>
+  Show as
+  <strong>
+   Inserts
+  </strong>
+  because a new group membership was created (transferred employees had their old group deleted by the
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   onBefore
+  </code>
+  script).
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Error count:
+  </strong>
+  Users whose SAM Account Name doesn't match any
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   sys_user
+  </code>
+  record.
+ </li>
+</ul>
+<h4 style="font-size: 14px; font-weight: bold; margin-top: 14px; margin-bottom: 6px; color: black;">
+ Transform Map #4  -  Set Employee Profile
+</h4>
+<pre style="background-color: whitesmoke; border: 1px solid lightgray; border-radius: 4px; padding: 12px; overflow-x: auto; font-family: Consolas, Monaco, monospace; font-size: 13px; line-height: 1.45; margin: 14px 0;"><code style="font-family: Consolas, Monaco, monospace; color: black; background: transparent; padding: 0;">Inserts: [small number  -  only users without prior Employee Profiles]
+Updates: [most rows  -  profile exists and primary_resource_group is maintained/updated]
+Errors:  [same as #3 errors]
+</code></pre>
+<ul style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+ <li style="margin-bottom: 4px;">
+  Should be predominantly updates
+ </li>
+ <li style="margin-bottom: 4px;">
+  Error count should match Transform Map #3's error count
+ </li>
+</ul>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ Red Flags
+</h3>
+<table class="table table-bordered table-striped" style="width: 100%; border-collapse: collapse; margin: 16px 0; border: 1px solid lightgray; font-size: 13px;">
+ <thead>
+  <tr>
+   <th style="background-color: whitesmoke; border: 1px solid lightgray; padding: 8px 10px; text-align: left; font-weight: bold; color: black;">
+    Symptom
+   </th>
+   <th style="background-color: whitesmoke; border: 1px solid lightgray; padding: 8px 10px; text-align: left; font-weight: bold; color: black;">
+    Likely Cause
+   </th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    Transform Map #1 has many inserts when few are expected
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    Case mismatch creating duplicate groups  -  check CSV casing
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    Transform Map #3 has high error count
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    SAM Account Names don't match
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     sys_user.u_samaccountname
+    </code>
+    -  check CSV data
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    Transform Map #4 has more errors than #3
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    Some users don't have Employee Profile records in
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     sn_employee_profile
+    </code>
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    An employee who transferred still has their old group
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    Transform Script in Map #3 may be inactive or
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     primary_resource_group
+    </code>
+    on their profile was empty before the run
+   </td>
+  </tr>
+ </tbody>
+</table>
+<hr style="border: 0; border-top: 1px solid lightgray; margin: 24px 0;"/>
+<h2 style="font-size: 18px; font-weight: bold; border-bottom: 1px solid lightgray; padding-bottom: 6px; margin-top: 24px; margin-bottom: 12px; color: black;">
+ 5. Investigate Errors
+</h2>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ View Error Details
+</h3>
+<ol style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+ <li style="margin-bottom: 4px;">
+  Navigate to
+  <strong>
+   System Import Sets → Import Sets
+  </strong>
+ </li>
+ <li style="margin-bottom: 4px;">
+  Open your Import Set
+ </li>
+ <li style="margin-bottom: 4px;">
+  Go to the
+  <strong>
+   Import Set Rows
+  </strong>
+  related list
+ </li>
+ <li style="margin-bottom: 4px;">
+  Filter by
+  <strong>
+   State = Error
+  </strong>
+ </li>
+ <li style="margin-bottom: 4px;">
+  Open each errored row  -  the
+  <strong>
+   Error message
+  </strong>
+  field explains the failure
+ </li>
+</ol>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ Common Errors and Fixes
+</h3>
+<table class="table table-bordered table-striped" style="width: 100%; border-collapse: collapse; margin: 16px 0; border: 1px solid lightgray; font-size: 13px;">
+ <thead>
+  <tr>
+   <th style="background-color: whitesmoke; border: 1px solid lightgray; padding: 8px 10px; text-align: left; font-weight: bold; color: black;">
+    Error Message
+   </th>
+   <th style="background-color: whitesmoke; border: 1px solid lightgray; padding: 8px 10px; text-align: left; font-weight: bold; color: black;">
+    Cause
+   </th>
+   <th style="background-color: whitesmoke; border: 1px solid lightgray; padding: 8px 10px; text-align: left; font-weight: bold; color: black;">
+    Resolution
+   </th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     No matching record found for u_samaccountname = [value]
+    </code>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    User doesn't exist in ServiceNow
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    Verify the SAM Account Name is correct; create the user first if needed
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     No matching record found for name = [value]
+    </code>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    Group wasn't created by Transform Map #1
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    Check if the Capacity Team column has a typo or blank value
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     Coalesce values not found
+    </code>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    Reference lookup failed
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    Check the Reference Value setting on the field mapping
+   </td>
+  </tr>
+ </tbody>
+</table>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ Re-Import Failed Rows
+</h3>
+<p>
+ If you fix the underlying issue (e.g., correct a SAM Account Name):
+</p>
+<ol style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+ <li style="margin-bottom: 4px;">
+  Create a small CSV with just the corrected rows
+ </li>
+ <li style="margin-bottom: 4px;">
+  Navigate to
+  <strong>
+   System Import Sets → Load Data
+  </strong>
+ </li>
+ <li style="margin-bottom: 4px;">
+  Upload to the same staging table
+ </li>
+ <li style="margin-bottom: 4px;">
+  Run the transform  -  only the new rows will be processed
+ </li>
+</ol>
+<hr style="border: 0; border-top: 1px solid lightgray; margin: 24px 0;"/>
+<h2 style="font-size: 18px; font-weight: bold; border-bottom: 1px solid lightgray; padding-bottom: 6px; margin-top: 24px; margin-bottom: 12px; color: black;">
+ 6. Verify Results
+</h2>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ Spot-Check Records (Do This Every Month)
+</h3>
+<p>
+ Pick
+ <strong>
+  3 - 5 users
+ </strong>
+ at random from the CSV. For each user:
+</p>
+<ol style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+ <li style="margin-bottom: 4px;">
+  <strong>
+   User record:
+  </strong>
+ </li>
+ <li style="margin-bottom: 4px;">
+  Navigate to
+  <strong>
+   User Administration → Users
+  </strong>
+ </li>
+ <li style="margin-bottom: 4px;">
+  Search by
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   u_samaccountname
+  </code>
+ </li>
+ <li style="margin-bottom: 4px;">
+  Open the user → check the
+  <strong>
+   Groups
+  </strong>
+  related list
+ </li>
+ <li style="margin-bottom: 4px;">
+  Verify the correct Capacity Team group appears
+ </li>
+ <li style="margin-bottom: 4px;">
+  Verify
+  <strong>
+   no duplicate capacity teams
+  </strong>
+  (only their current capacity team should be listed under pps_resource groups)
+ </li>
+ <li style="margin-bottom: 4px;">
+  <p>
+   <strong>
+    Verify Creation Timestamp:
+   </strong>
+   Ensure
+   <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+    Created
+   </code>
+   (
+   <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+    sys_created_on
+   </code>
+   ) was
+   <strong>
+    not
+   </strong>
+   updated to today's date for unchanged employees.
+  </p>
+ </li>
+ <li style="margin-bottom: 4px;">
+  <p>
+   <strong>
+    Group record:
+   </strong>
+  </p>
+ </li>
+ <li style="margin-bottom: 4px;">
+  Open the Capacity Team group
+ </li>
+ <li style="margin-bottom: 4px;">
+  Check the
+  <strong>
+   Roles
+  </strong>
+  related list
+ </li>
+ <li style="margin-bottom: 4px;">
+  <p>
+   Verify
+   <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+    pps_resource
+   </code>
+   role is assigned
+  </p>
+ </li>
+ <li style="margin-bottom: 4px;">
+  <p>
+   <strong>
+    Employee Profile:
+   </strong>
+  </p>
+ </li>
+ <li style="margin-bottom: 4px;">
+  Navigate to the user's Employee Profile (
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   sn_employee_profile
+  </code>
+  )
+ </li>
+ <li style="margin-bottom: 4px;">
+  <p>
+   Verify
+   <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+    primary_resource_group
+   </code>
+   shows the correct Capacity Team
+  </p>
+ </li>
+ <li style="margin-bottom: 4px;">
+  <p>
+   <strong>
+    SPM views:
+   </strong>
+  </p>
+ </li>
+ <li style="margin-bottom: 4px;">
+  Navigate to
+  <strong>
+   Resource Management
+  </strong>
+  in the SPM module
+ </li>
+ <li style="margin-bottom: 4px;">
+  Verify the user appears under their assigned capacity team
+ </li>
+</ol>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ Verify Users Who Changed Teams
+</h3>
+<p>
+ If you know specific users changed capacity teams this month:
+</p>
+<ul style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+ <li style="margin-bottom: 4px;">
+  Confirm they are
+  <strong>
+   only
+  </strong>
+  in their new group (the old group was removed)
+ </li>
+ <li style="margin-bottom: 4px;">
+  Confirm
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   primary_resource_group
+  </code>
+  on their Employee Profile shows the
+  <strong>
+   new
+  </strong>
+  team
+ </li>
+</ul>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ Count Validation
+</h3>
+<table class="table table-bordered table-striped" style="width: 100%; border-collapse: collapse; margin: 16px 0; border: 1px solid lightgray; font-size: 13px;">
+ <thead>
+  <tr>
+   <th style="background-color: whitesmoke; border: 1px solid lightgray; padding: 8px 10px; text-align: left; font-weight: bold; color: black;">
+    Check
+   </th>
+   <th style="background-color: whitesmoke; border: 1px solid lightgray; padding: 8px 10px; text-align: left; font-weight: bold; color: black;">
+    Where to Verify
+   </th>
+   <th style="background-color: whitesmoke; border: 1px solid lightgray; padding: 8px 10px; text-align: left; font-weight: bold; color: black;">
+    Expected
+   </th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    Groups created
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    Transform Map #1 results
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    Only new teams
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    Roles assigned
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    Transform Map #2 results
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    Matches #1
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    Memberships updated
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    Transform Map #3 results
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    Most rows (unchanged employees)
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    Memberships created
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    Transform Map #3 results
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    Small count (new users + transferred users)
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    Profiles updated
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    Transform Map #4 results
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    Matches total valid rows
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    Errors (total)
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    Import Set Rows → State = Error
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    Consistent across #3 and #4
+   </td>
+  </tr>
+ </tbody>
+</table>
+<hr style="border: 0; border-top: 1px solid lightgray; margin: 24px 0;"/>
+<h2 style="font-size: 18px; font-weight: bold; border-bottom: 1px solid lightgray; padding-bottom: 6px; margin-top: 24px; margin-bottom: 12px; color: black;">
+ 7. Generate Resource Capacity
+</h2>
+<p>
+ After verifying the import results, manually run the capacity generation job to refresh SPM capacity data with the updated resource groups.
+</p>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ Steps
+</h3>
+<ol style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+ <li style="margin-bottom: 4px;">
+  Navigate to
+  <strong>
+   System Definition → Scheduled Jobs
+  </strong>
+ </li>
+ <li style="margin-bottom: 4px;">
+  Search for
+  <strong>
+   "Generate Resource Capacity"
+  </strong>
+ </li>
+ <li style="margin-bottom: 4px;">
+  Open the job record
+ </li>
+ <li style="margin-bottom: 4px;">
+  Click
+  <strong>
+   Execute Now
+  </strong>
+ </li>
+ <li style="margin-bottom: 4px;">
+  Wait for the job to complete  -  check the
+  <strong>
+   Last run
+  </strong>
+  field to confirm it finished
+ </li>
+</ol>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ What This Does
+</h3>
+<ul style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+ <li style="margin-bottom: 4px;">
+  Recalculates capacity and availability for all resource groups
+ </li>
+ <li style="margin-bottom: 4px;">
+  Updates the data shown in
+  <strong>
+   Resource Management
+  </strong>
+  and
+  <strong>
+   Capacity Planning
+  </strong>
+  SPM views
+ </li>
+ <li style="margin-bottom: 4px;">
+  Ensures the newly imported/updated resource group assignments are reflected immediately
+ </li>
+</ul>
+<div class="alert alert-info" style="padding: 12px 16px; margin: 16px 0; border: 1px solid lightgray; border-left: 5px solid darkblue; border-radius: 4px; background-color: aliceblue; font-size: 13px;">
+ <strong style="color: darkblue;">
+  Note:
+ </strong>
+ <p>
+  This job already runs weekly on its own schedule. Running it manually here ensures the capacity data is updated right away after the import rather than waiting for the next weekly run.
+ </p>
+</div>
+<hr style="border: 0; border-top: 1px solid lightgray; margin: 24px 0;"/>
+<h2 style="font-size: 18px; font-weight: bold; border-bottom: 1px solid lightgray; padding-bottom: 6px; margin-top: 24px; margin-bottom: 12px; color: black;">
+ 8. Communicate Results
+</h2>
+<p>
+ After verification, share a brief summary with stakeholders:
+</p>
+<pre style="background-color: whitesmoke; border: 1px solid lightgray; border-radius: 4px; padding: 12px; overflow-x: auto; font-family: Consolas, Monaco, monospace; font-size: 13px; line-height: 1.45; margin: 14px 0;"><code style="font-family: Consolas, Monaco, monospace; color: black; background: transparent; padding: 0;">Resource Group Monthly Import  -  [Month Year]
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+CSV rows processed:         [number]
+New groups created:         [number]
+Memberships maintained:     [number] (unchanged)
+Memberships created/trans:  [number] (new or transferred)
+Employee profiles updated:  [number]
+Errors:                     [number]  -  [brief explanation]
+Spot-check:                 Passed
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+</code></pre>
+<hr style="border: 0; border-top: 1px solid lightgray; margin: 24px 0;"/>
+<h2 style="font-size: 18px; font-weight: bold; border-bottom: 1px solid lightgray; padding-bottom: 6px; margin-top: 24px; margin-bottom: 12px; color: black;">
+ 9. Troubleshooting
+</h2>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ An employee transferred teams but is still in their old group
+</h3>
+<ul style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+ <li style="margin-bottom: 4px;">
+  Open Transform Map #3 (
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   RG Import - 3 - Create Memberships
+  </code>
+  )
+ </li>
+ <li style="margin-bottom: 4px;">
+  Check the
+  <strong>
+   Transform Scripts
+  </strong>
+  related list to verify the
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   onBefore
+  </code>
+  script is present and
+  <strong>
+   Active
+  </strong>
+ </li>
+ <li style="margin-bottom: 4px;">
+  Check
+  <strong>
+   System Logs → Application Logs
+  </strong>
+  for
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   RG Import #3:
+  </code>
+  to see if the user lookup or group lookup failed
+ </li>
+ <li style="margin-bottom: 4px;">
+  Verify the employee's
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   sn_employee_profile
+  </code>
+  record actually had their old group populated in
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   primary_resource_group
+  </code>
+  before the run
+ </li>
+</ul>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ The import didn't pick up the new CSV
+</h3>
+<ul style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+ <li style="margin-bottom: 4px;">
+  Check the
+  <strong>
+   Data Source
+  </strong>
+  -  is the new file attached?
+ </li>
+ <li style="margin-bottom: 4px;">
+  For SFTP: verify the file was delivered to the correct path with the expected filename
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Manual workaround:
+  </strong>
+  Upload CSV via
+  <strong>
+   System Import Sets → Load Data
+  </strong>
+  using the existing staging table
+ </li>
+</ul>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ Duplicate groups were created
+</h3>
+<ul style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+ <li style="margin-bottom: 4px;">
+  Likely a casing mismatch (e.g.,
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   "Cloud Infra"
+  </code>
+  vs
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   "cloud infra"
+  </code>
+  )
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Fix:
+  </strong>
+  Delete the duplicate group, update the CSV to match the correct casing, re-run the import for affected rows
+ </li>
+</ul>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ Transform Map #4 creating inserts instead of updates
+</h3>
+<ul style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+ <li style="margin-bottom: 4px;">
+  The coalesce field mapping may not be matching correctly
+ </li>
+ <li style="margin-bottom: 4px;">
+  Verify the
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   user
+  </code>
+  field on
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   sn_employee_profile
+  </code>
+  is a reference to
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   sys_user
+  </code>
+ </li>
+ <li style="margin-bottom: 4px;">
+  Verify the
+  <strong>
+   Reference value
+  </strong>
+  is set to
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   u_samaccountname
+  </code>
+ </li>
+</ul>
+
+
+</div>

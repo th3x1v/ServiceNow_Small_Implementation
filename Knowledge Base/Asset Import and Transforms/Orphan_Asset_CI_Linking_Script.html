@@ -1,0 +1,223 @@
+<!-- 
+  ServiceNow Knowledge Base Article: KB - Orphan Asset CI Linking Script
+  Category: Asset Import and Transforms
+  Instructions:
+  1. Open ServiceNow -> Knowledge -> Articles -> Create New (or open kb_knowledge form).
+  2. In the "Article Body" (text field) TinyMCE toolbar, click the Source Code icon (<>).
+  3. Paste this entire HTML block into the source window and click OK.
+  4. Fill in Short Description: "KB - Orphan Asset CI Linking Script"
+  5. Select Knowledge Base and Category: "Asset Import and Transforms"
+  6. Click Save or Publish.
+-->
+<div class="sn-kb-article" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 14px; line-height: 1.6; color: black; max-width: 100%;">
+  
+  <!-- KB Metadata Header Callout -->
+  <div class="alert alert-info" style="padding: 12px 16px; margin-bottom: 20px; border: 1px solid lightgray; border-left: 5px solid darkblue; border-radius: 4px; background-color: aliceblue; font-size: 13px;">
+    <div style="font-weight: bold; font-size: 15px; margin-bottom: 4px; color: darkblue;">Knowledge Base Article Details</div>
+    <div><strong>Title:</strong> KB - Orphan Asset CI Linking Script</div>
+    <div><strong>Category:</strong> Asset Import and Transforms</div>
+    <div><strong>Audience:</strong> ServiceNow Administrators, Change Managers, IT Operations</div>
+  </div>
+
+  <!-- Article Body Content -->
+<h1 style="font-size: 22px; font-weight: bold; border-bottom: 2px solid lightgray; padding-bottom: 8px; margin-top: 16px; margin-bottom: 16px; color: black;">
+ ServiceNow Asset &amp; CI Alignment Scripts
+</h1>
+<p>
+ This document contains administrative background scripts used to repair and align Asset-CI synchronization links in ServiceNow.
+</p>
+<hr style="border: 0; border-top: 1px solid lightgray; margin: 24px 0;"/>
+<h2 style="font-size: 18px; font-weight: bold; border-bottom: 1px solid lightgray; padding-bottom: 6px; margin-top: 24px; margin-bottom: 12px; color: black;">
+ Scenario A: Duplicate Asset Clean-up (SCCM/Discovery Duplicates)
+</h2>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ Purpose
+</h3>
+<p>
+ If the Asset-CI synchronization chain breaks (e.g., an Asset was imported without a Model Category, failing to create a Shell CI), Discovery sources like SCCM/MECM will fail to find the existing Asset. As a result, Discovery will create a new CI, which automatically triggers the creation of a duplicate Asset record.
+</p>
+<p>
+ This script forcefully links orphaned CIs (created by Discovery) to their original Procurement Assets based on the
+ <strong>
+  Serial Number
+ </strong>
+ , and safely deletes the accidental duplicate Asset record.
+</p>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ When to Use
+</h3>
+<p>
+ Run this script when you have generated duplicate Assets because Discovery imported CIs that failed to match your existing Procurement Assets.
+</p>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ How to Run
+</h3>
+<ol style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+ <li style="margin-bottom: 4px;">
+  Log in to ServiceNow as an Administrator.
+ </li>
+ <li style="margin-bottom: 4px;">
+  Navigate to
+  <strong>
+   System Definition &gt; Scripts - Background
+  </strong>
+  .
+ </li>
+ <li style="margin-bottom: 4px;">
+  Copy and paste the script below.
+ </li>
+ <li style="margin-bottom: 4px;">
+  <em>
+   (Recommended)
+  </em>
+  If you want to test it first without deleting anything, comment out
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   dupAsset.deleteRecord();
+  </code>
+  (Line 36 of the script).
+ </li>
+ <li style="margin-bottom: 4px;">
+  Click
+  <strong>
+   Run Script
+  </strong>
+  .
+ </li>
+</ol>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ The Script
+</h3>
+<pre style="background-color: whitesmoke; border: 1px solid lightgray; border-radius: 4px; padding: 12px; overflow-x: auto; font-family: Consolas, Monaco, monospace; font-size: 13px; line-height: 1.45; margin: 14px 0;"><code class="language-javascript" style="font-family: Consolas, Monaco, monospace; color: black; background: transparent; padding: 0;">// Target the CIs that were created today by Discovery (which are currently attached to duplicate assets)
+var ci = new GlideRecord('cmdb_ci_computer');
+ci.addEncodedQuery('asset.sys_created_onONToday@javascript:gs.beginningOfToday()@javascript:gs.endOfToday()'); 
+ci.query();
+
+var linkCount = 0;
+while (ci.next()) {
+    var serial = ci.serial_number.toString();
+
+    // Find the original procurement asset (created before today) that matches the serial number
+    var originalAsset = new GlideRecord('alm_hardware');
+    originalAsset.addQuery('serial_number', serial);
+    originalAsset.addEncodedQuery('sys_created_on&lt;javascript:gs.beginningOfToday()');
+    originalAsset.setLimit(1);
+    originalAsset.query();
+
+    if (originalAsset.next()) {
+        // 1. Save the sys_id of the accidental duplicate asset Discovery just made
+        var duplicateAssetId = ci.asset.toString();
+
+        // 2. Link the CI to the original procurement asset
+        ci.asset = originalAsset.getUniqueValue();
+        ci.setWorkflow(false); // Do not trigger Business Rules
+        ci.update();
+
+        // 3. Link the original procurement asset back to the CI
+        originalAsset.ci = ci.getUniqueValue();
+        originalAsset.setWorkflow(false); // Do not trigger Business Rules
+        originalAsset.update();
+
+        // 4. Delete the accidental duplicate asset
+        if (duplicateAssetId) {
+            var dupAsset = new GlideRecord('alm_hardware');
+            if (dupAsset.get(duplicateAssetId)) {
+                dupAsset.setWorkflow(false); // Prevent cascade delete rules
+                dupAsset.deleteRecord();
+            }
+        }
+        linkCount++;
+    }
+}
+gs.print("Successfully linked " + linkCount + " CIs to their original Procurement Assets and cleaned up the duplicates!");
+</code></pre>
+<hr style="border: 0; border-top: 1px solid lightgray; margin: 24px 0;"/>
+<h2 style="font-size: 18px; font-weight: bold; border-bottom: 1px solid lightgray; padding-bottom: 6px; margin-top: 24px; margin-bottom: 12px; color: black;">
+ Scenario B: Retroactive Asset-CI Linking (CIs Created Before Asset Import)
+</h2>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ Purpose
+</h3>
+<p>
+ Ideally, Assets are imported before devices go live on the network, allowing the MECM/SCCM Service Graph Connector to naturally resolve and link them.
+</p>
+<p>
+ However, if a group onboards computers without notice, Discovery will create CIs first. When you manually import the assets later, they will not be linked to the pre-existing CIs. This script retroactively binds the newly imported Assets to those pre-existing CIs based on matching
+ <strong>
+  Serial Numbers
+ </strong>
+ .
+</p>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ When to Use
+</h3>
+<p>
+ Run this script when CIs already exist in the CMDB and you have manually imported the Assets afterward, leaving both records unlinked.
+</p>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ How to Run
+</h3>
+<ol style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+ <li style="margin-bottom: 4px;">
+  Navigate to
+  <strong>
+   System Definition &gt; Scripts - Background
+  </strong>
+  .
+ </li>
+ <li style="margin-bottom: 4px;">
+  Copy and paste the script below.
+ </li>
+ <li style="margin-bottom: 4px;">
+  Click
+  <strong>
+   Run Script
+  </strong>
+  .
+ </li>
+</ol>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ The Script
+</h3>
+<pre style="background-color: whitesmoke; border: 1px solid lightgray; border-radius: 4px; padding: 12px; overflow-x: auto; font-family: Consolas, Monaco, monospace; font-size: 13px; line-height: 1.45; margin: 14px 0;"><code class="language-javascript" style="font-family: Consolas, Monaco, monospace; color: black; background: transparent; padding: 0;">// 1. Query only the assets that do not have a CI linked yet
+var asset = new GlideRecord('alm_hardware');
+asset.addNullQuery('ci');
+asset.addNotNullQuery('serial_number');
+asset.query();
+
+var linkCount = 0;
+var notFoundCount = 0;
+
+while (asset.next()) {
+    var serial = asset.serial_number.toString().trim();
+    if (!serial) continue;
+
+    // 2. Find the hardware CI in the CMDB that matches this serial number
+    var ci = new GlideRecord('cmdb_ci_hardware');
+    ci.addQuery('serial_number', serial);
+    ci.setLimit(1);
+    ci.query();
+
+    if (ci.next()) {
+        // 3. Link CI to Asset
+        ci.asset = asset.getUniqueValue();
+        ci.setWorkflow(false); // Bypasses business rules to prevent duplicate asset generation
+        ci.update();
+
+        // 4. Link Asset to CI
+        asset.ci = ci.getUniqueValue();
+        asset.setWorkflow(false);
+        asset.update();
+
+        linkCount++;
+    } else {
+        notFoundCount++;
+    }
+}
+
+gs.print("Completed!");
+gs.print("-&gt; Successfully linked: " + linkCount + " Assets to CIs");
+gs.print("-&gt; Assets with no matching CI found: " + notFoundCount);
+</code></pre>
+
+
+</div>

@@ -1,0 +1,862 @@
+<!-- 
+  ServiceNow Knowledge Base Article: KB - CAB Definition Integration Guide
+  Category: Change Management
+  Instructions:
+  1. Open ServiceNow -> Knowledge -> Articles -> Create New (or open kb_knowledge form).
+  2. In the "Article Body" (text field) TinyMCE toolbar, click the Source Code icon (<>).
+  3. Paste this entire HTML block into the source window and click OK.
+  4. Fill in Short Description: "KB - CAB Definition Integration Guide"
+  5. Select Knowledge Base and Category: "Change Management"
+  6. Click Save or Publish.
+-->
+<div class="sn-kb-article" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 14px; line-height: 1.6; color: black; max-width: 100%;">
+  
+  <!-- KB Metadata Header Callout -->
+  <div class="alert alert-info" style="padding: 12px 16px; margin-bottom: 20px; border: 1px solid lightgray; border-left: 5px solid darkblue; border-radius: 4px; background-color: aliceblue; font-size: 13px;">
+    <div style="font-weight: bold; font-size: 15px; margin-bottom: 4px; color: darkblue;">Knowledge Base Article Details</div>
+    <div><strong>Title:</strong> KB - CAB Definition Integration Guide</div>
+    <div><strong>Category:</strong> Change Management</div>
+    <div><strong>Audience:</strong> ServiceNow Administrators, Change Managers, IT Operations</div>
+  </div>
+
+  <!-- Article Body Content -->
+<h1 style="font-size: 22px; font-weight: bold; border-bottom: 2px solid lightgray; padding-bottom: 8px; margin-top: 16px; margin-bottom: 16px; color: black;">
+ ServiceNow Asynchronous CAB Management Guide (Zero-Meeting Architecture)
+</h1>
+<p>
+ This guide details how to implement a
+ <strong>
+  pure asynchronous CAB review process
+ </strong>
+ in ServiceNow without generating CAB Meeting records (
+ <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+  cab_meeting
+ </code>
+ ), CAB Agenda Items (
+ <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+  cab_agenda_item
+ </code>
+ ), or using the CAB Workbench.
+</p>
+<hr style="border: 0; border-top: 1px solid lightgray; margin: 24px 0;"/>
+<h2 style="font-size: 18px; font-weight: bold; border-bottom: 1px solid lightgray; padding-bottom: 6px; margin-top: 24px; margin-bottom: 12px; color: black;">
+ 1. Cleanup: Decommissioning CAB Meetings &amp; Definitions
+</h2>
+<p>
+ If you previously set up a CAB Definition and have test meetings, follow these steps to stop automatic meeting generation and purge unwanted test records.
+</p>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ Step 1.1: Deactivate the CAB Definition
+</h3>
+<ol style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+ <li style="margin-bottom: 4px;">
+  In the Filter Navigator, go to
+  <strong>
+   Change &gt; Change Advisory Board &gt; CAB Definitions
+  </strong>
+  .
+ </li>
+ <li style="margin-bottom: 4px;">
+  Open your CAB Definition record.
+ </li>
+ <li style="margin-bottom: 4px;">
+  Uncheck the
+  <strong>
+   Active
+  </strong>
+  checkbox.
+ </li>
+ <li style="margin-bottom: 4px;">
+  Under the
+  <strong>
+   Schedule
+  </strong>
+  section, clear the schedule reference.
+ </li>
+ <li style="margin-bottom: 4px;">
+  Click
+  <strong>
+   Update
+  </strong>
+  .
+ </li>
+</ol>
+<div class="alert alert-info" style="padding: 12px 16px; margin: 16px 0; border: 1px solid lightgray; border-left: 5px solid darkblue; border-radius: 4px; background-color: aliceblue; font-size: 13px;">
+ <strong style="color: darkblue;">
+  Note:
+ </strong>
+ <p>
+  Deactivating the CAB Definition prevents ServiceNow's scheduled jobs (
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   CABDefinitionUtil
+  </code>
+  ) from automatically creating upcoming
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   cab_meeting
+  </code>
+  records and pulling changes into agenda items.
+ </p>
+</div>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ Step 1.2: Delete Existing Test CAB Meetings &amp; Agenda Items
+</h3>
+<ol style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+ <li style="margin-bottom: 4px;">
+  Navigate to
+  <strong>
+   Change &gt; Change Advisory Board &gt; All CAB Meetings
+  </strong>
+  (or type
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   cab_meeting.list
+  </code>
+  in the filter navigator).
+ </li>
+ <li style="margin-bottom: 4px;">
+  Filter the list to locate your test meetings.
+ </li>
+ <li style="margin-bottom: 4px;">
+  Select the checkboxes next to the test meetings.
+ </li>
+ <li style="margin-bottom: 4px;">
+  At the bottom of the list, select
+  <strong>
+   Action on selected rows &gt; Delete
+  </strong>
+  . Confirm deletion.
+  <br/>
+  <em>
+   (Deleting the CAB Meeting record automatically cascades and removes all associated
+   <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+    cab_agenda_item
+   </code>
+   records.)
+  </em>
+ </li>
+</ol>
+<div class="alert alert-success" style="padding: 12px 16px; margin: 16px 0; border: 1px solid lightgray; border-left: 5px solid darkgreen; border-radius: 4px; background-color: honeydew; font-size: 13px;">
+ <strong style="color: darkgreen;">
+  Tip:
+ </strong>
+ <p>
+  <strong>
+   Optional Scripted Purge via Background Scripts (
+   <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+    sys.scripts.do
+   </code>
+   ):
+  </strong>
+  If you have numerous test meeting records:
+ </p>
+ <pre style="background-color: whitesmoke; border: 1px solid lightgray; border-radius: 4px; padding: 12px; overflow-x: auto; font-family: Consolas, Monaco, monospace; font-size: 13px; line-height: 1.45; margin: 14px 0;"><code class="language-javascript" style="font-family: Consolas, Monaco, monospace; color: black; background: transparent; padding: 0;">var grMeeting = new GlideRecord('cab_meeting');
+// Optional: grMeeting.addQuery('cab_definition.name', 'CONTAINS', 'Test');
+grMeeting.query();
+while (grMeeting.next()) {
+    grMeeting.deleteRecord(); // Cascades to cab_agenda_item
+}
+</code></pre>
+</div>
+<hr style="border: 0; border-top: 1px solid lightgray; margin: 24px 0;"/>
+<h2 style="font-size: 18px; font-weight: bold; border-bottom: 1px solid lightgray; padding-bottom: 6px; margin-top: 24px; margin-bottom: 12px; color: black;">
+ 2. Review Criteria &amp; Approval Strategy
+</h2>
+<p>
+ We are implementing
+ <strong>
+  Option 3 (Hybrid Asynchronous Architecture)
+ </strong>
+ :
+ <br/>
+ 1.
+ <strong>
+  Real-time Event-Driven Approvals
+ </strong>
+ : As soon as a Normal change enters
+ <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+  Authorize
+ </code>
+ and meets the date criteria, approval records are generated for
+ <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+  &lt;CAB_APPROVAL_GROUP&gt;
+ </code>
+ .
+ <br/>
+ 2.
+ <strong>
+  Quorum Requirement
+ </strong>
+ :
+ <strong>
+  All members must approve
+ </strong>
+ . If any member rejects, the change is rejected back for reassessment.
+ <br/>
+ 3.
+ <strong>
+  Weekly Asynchronous Digest
+ </strong>
+ : A scheduled job/flow compiles all active changes in
+ <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+  Authorize
+ </code>
+ for that planned window and sends a single consolidated digest email to
+ <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+  &lt;CAB_APPROVAL_GROUP&gt;
+ </code>
+ as a centralized dashboard/reminder.
+</p>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ Filter Criteria
+</h3>
+<ul style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+ <li style="margin-bottom: 4px;">
+  <strong>
+   State
+  </strong>
+  :
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   Authorize
+  </code>
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Type
+  </strong>
+  :
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   Normal
+  </code>
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Planned start date
+  </strong>
+  :
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   between last week and next week
+  </code>
+ </li>
+</ul>
+<hr style="border: 0; border-top: 1px solid lightgray; margin: 24px 0;"/>
+<h2 style="font-size: 18px; font-weight: bold; border-bottom: 1px solid lightgray; padding-bottom: 6px; margin-top: 24px; margin-bottom: 12px; color: black;">
+ 3. Implementation: Flow Designer &amp; Change Approval Policy
+</h2>
+<p>
+ You can implement the approval trigger using either
+ <strong>
+  Change Approval Policies
+ </strong>
+ (OOB modern framework) or directly within
+ <strong>
+  Flow Designer
+ </strong>
+ .
+</p>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ Method A: Flow Designer Direct Flow (Recommended for full control)
+</h3>
+<ol style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+ <li style="margin-bottom: 4px;">
+  Navigate to
+  <strong>
+   Process Automation &gt; Flow Designer
+  </strong>
+  .
+ </li>
+ <li style="margin-bottom: 4px;">
+  Open or create a subflow/flow for Normal Change Authorize (e.g.,
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   Change - Normal - Authorize
+  </code>
+  ).
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Trigger
+  </strong>
+  :
+ </li>
+ <li style="margin-bottom: 4px;">
+  Table:
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   Change Request [change_request]
+  </code>
+ </li>
+ <li style="margin-bottom: 4px;">
+  Condition:
+  <ul style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+   <li style="margin-bottom: 4px;">
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     State changes to Authorize
+    </code>
+   </li>
+   <li style="margin-bottom: 4px;">
+    AND
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     Type is Normal
+    </code>
+   </li>
+  </ul>
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Action 1: Check Planned Start Date Window
+  </strong>
+  :
+ </li>
+ <li style="margin-bottom: 4px;">
+  Add an
+  <strong>
+   If
+  </strong>
+  block:
+  <ul style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+   <li style="margin-bottom: 4px;">
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     Trigger -&gt; Change Request -&gt; Planned start date
+    </code>
+    <strong>
+     between
+    </strong>
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     Last week
+    </code>
+    and
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     Next week
+    </code>
+   </li>
+  </ul>
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Action 2: Ask for Approval
+  </strong>
+  :
+ </li>
+ <li style="margin-bottom: 4px;">
+  Record:
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   Trigger -&gt; Change Request
+  </code>
+ </li>
+ <li style="margin-bottom: 4px;">
+  Approval Conditions:
+  <ul style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+   <li style="margin-bottom: 4px;">
+    <strong>
+     Approve when
+    </strong>
+    :
+    <strong>
+     Everyone approves
+    </strong>
+    from Group
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     &lt;CAB_APPROVAL_GROUP&gt;
+    </code>
+    .
+   </li>
+   <li style="margin-bottom: 4px;">
+    <strong>
+     Reject when
+    </strong>
+    :
+    <strong>
+     Anyone rejects
+    </strong>
+    from Group
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     &lt;CAB_APPROVAL_GROUP&gt;
+    </code>
+    .
+   </li>
+  </ul>
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Action 3: Evaluate Decision
+  </strong>
+  :
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   If Approval State is Approved
+  </strong>
+  :
+  <ul style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+   <li style="margin-bottom: 4px;">
+    Update Change Request Record:
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     State
+    </code>
+    -&gt;
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     Scheduled
+    </code>
+    (Value
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     -2
+    </code>
+    ).
+   </li>
+   <li style="margin-bottom: 4px;">
+    Add Work note:
+    <em>
+     "All members of
+     <cab_approval_group>
+      approved the change asynchronously."
+     </cab_approval_group>
+    </em>
+   </li>
+  </ul>
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   If Approval State is Rejected
+  </strong>
+  :
+  <ul style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+   <li style="margin-bottom: 4px;">
+    Update Change Request Record:
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     State
+    </code>
+    -&gt;
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     Assess
+    </code>
+    (Value
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     -4
+    </code>
+    ) or
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     New
+    </code>
+    (Value
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     -5
+    </code>
+    ).
+   </li>
+   <li style="margin-bottom: 4px;">
+    Add Work note:
+    <em>
+     "Change rejected during asynchronous CAB review."
+    </em>
+   </li>
+  </ul>
+ </li>
+</ol>
+<hr style="border: 0; border-top: 1px solid lightgray; margin: 24px 0;"/>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ Method B: Change Approval Policy (OOB Enterprise Framework)
+</h3>
+<p>
+ If your organization uses ServiceNow's Change Approval Policy engine:
+ <br/>
+ 1. Navigate to
+ <strong>
+  Change &gt; Administration &gt; Change Approval Policies
+ </strong>
+ .
+ <br/>
+ 2. Open
+ <strong>
+  Normal Change Policy
+ </strong>
+ .
+ <br/>
+ 3. Create a
+ <strong>
+  Policy Decision
+ </strong>
+ :
+ <br/>
+ -
+ <strong>
+  Name
+ </strong>
+ :
+ <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+  Normal Change - CAB Async Review
+ </code>
+ <br/>
+ -
+ <strong>
+  Condition
+ </strong>
+ :
+ <br/>
+ -
+ <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+  Type is Normal
+ </code>
+ <br/>
+ - AND
+ <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+  Planned start date between last week and next week
+ </code>
+ <br/>
+ 4. Under the Decision, add an
+ <strong>
+  Approval Definition
+ </strong>
+ :
+ <br/>
+ -
+ <strong>
+  Approval Type
+ </strong>
+ :
+ <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+  Group
+ </code>
+ <br/>
+ -
+ <strong>
+  Group
+ </strong>
+ :
+ <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+  &lt;CAB_APPROVAL_GROUP&gt;
+ </code>
+ <br/>
+ -
+ <strong>
+  Wait for
+ </strong>
+ :
+ <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+  ApprovesAll
+ </code>
+ (Requires 100% approval from all group members)
+ <br/>
+ -
+ <strong>
+  Reject if
+ </strong>
+ :
+ <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+  RejectsAny
+ </code>
+</p>
+<hr style="border: 0; border-top: 1px solid lightgray; margin: 24px 0;"/>
+<h2 style="font-size: 18px; font-weight: bold; border-bottom: 1px solid lightgray; padding-bottom: 6px; margin-top: 24px; margin-bottom: 12px; color: black;">
+ 4. Asynchronous 1-Click Voting via Email
+</h2>
+<p>
+ When the
+ <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+  Ask for Approval
+ </code>
+ action executes, ServiceNow creates
+ <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+  sysapproval_approver
+ </code>
+ records for each member of
+ <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+  &lt;CAB_APPROVAL_GROUP&gt;
+ </code>
+ .
+</p>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ Step 4.1: Notification Configuration
+</h3>
+<ol style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+ <li style="margin-bottom: 4px;">
+  Navigate to
+  <strong>
+   System Notification &gt; Email &gt; Notifications
+  </strong>
+  .
+ </li>
+ <li style="margin-bottom: 4px;">
+  Locate the notification:
+  <strong>
+   Change Request - Approval
+  </strong>
+  .
+ </li>
+ <li style="margin-bottom: 4px;">
+  Ensure it triggers when:
+ </li>
+ <li style="margin-bottom: 4px;">
+  Table:
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   Approval [sysapproval_approver]
+  </code>
+ </li>
+ <li style="margin-bottom: 4px;">
+  Condition:
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   State changes to Requested
+  </code>
+  AND
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   Approval for.Task type is Change Request
+  </code>
+  .
+ </li>
+ <li style="margin-bottom: 4px;">
+  Recipients:
+ </li>
+ <li style="margin-bottom: 4px;">
+  Check
+  <strong>
+   Approver
+  </strong>
+  (
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   approver
+  </code>
+  field).
+ </li>
+</ol>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ Step 4.2: Email Template &amp; 1-Click Action Links
+</h3>
+<p>
+ In the email body, include the OOB
+ <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+  mailto
+ </code>
+ links for zero-friction voting directly from Outlook/Apple Mail/Webmail:
+</p>
+<pre style="background-color: whitesmoke; border: 1px solid lightgray; border-radius: 4px; padding: 12px; overflow-x: auto; font-family: Consolas, Monaco, monospace; font-size: 13px; line-height: 1.45; margin: 14px 0;"><code class="language-html" style="font-family: Consolas, Monaco, monospace; color: black; background: transparent; padding: 0;">&lt;p&gt;Change Request &lt;strong&gt;${sysapproval.number}&lt;/strong&gt; requires your review and authorization.&lt;/p&gt;
+
+&lt;table style="border-collapse: collapse; width: 100%;"&gt;
+  &lt;tr&gt;&lt;td&gt;&lt;strong&gt;Short Description:&lt;/strong&gt;&lt;/td&gt;&lt;td&gt;${sysapproval.short_description}&lt;/td&gt;&lt;/tr&gt;
+  &lt;tr&gt;&lt;td&gt;&lt;strong&gt;Planned Start:&lt;/strong&gt;&lt;/td&gt;&lt;td&gt;${sysapproval.start_date}&lt;/td&gt;&lt;/tr&gt;
+  &lt;tr&gt;&lt;td&gt;&lt;strong&gt;Planned End:&lt;/strong&gt;&lt;/td&gt;&lt;td&gt;${sysapproval.end_date}&lt;/td&gt;&lt;/tr&gt;
+  &lt;tr&gt;&lt;td&gt;&lt;strong&gt;Risk / Impact:&lt;/strong&gt;&lt;/td&gt;&lt;td&gt;${sysapproval.risk} / ${sysapproval.impact}&lt;/td&gt;&lt;/tr&gt;
+  &lt;tr&gt;&lt;td&gt;&lt;strong&gt;Implementation Plan:&lt;/strong&gt;&lt;/td&gt;&lt;td&gt;${sysapproval.implementation_plan}&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;
+
+&lt;p&gt;Please review and cast your asynchronous vote:&lt;/p&gt;
+&lt;p&gt;
+  &lt;strong&gt;${mailto:mailto.approval}&lt;/strong&gt; | 
+  &lt;strong&gt;${mailto:mailto.rejection}&lt;/strong&gt;
+&lt;/p&gt;
+&lt;p&gt;Or review full details in the portal: &lt;a href="/sp?id=approval&amp;table=sysapproval_approver&amp;sys_id=${sys_id}"&gt;Open Approval Record&lt;/a&gt;&lt;/p&gt;
+</code></pre>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ Step 4.3: Inbound Email Action Verification
+</h3>
+<ol style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+ <li style="margin-bottom: 4px;">
+  Navigate to
+  <strong>
+   System Policy &gt; Email &gt; Inbound Actions
+  </strong>
+  .
+ </li>
+ <li style="margin-bottom: 4px;">
+  Open
+  <strong>
+   Update Approval Record
+  </strong>
+  .
+ </li>
+ <li style="margin-bottom: 4px;">
+  Verify that the action is
+  <strong>
+   Active
+  </strong>
+  .
+ </li>
+ <li style="margin-bottom: 4px;">
+  When an approver clicks the "Approve" mailto link, their email client generates a reply with:
+ </li>
+ <li style="margin-bottom: 4px;">
+  Subject:
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   Re: Change Request CHG00... - approve
+  </code>
+ </li>
+ <li style="margin-bottom: 4px;">
+  Body contains the ServiceNow watermark (e.g.,
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   Ref:MSG...
+  </code>
+  )
+ </li>
+ <li style="margin-bottom: 4px;">
+  The Inbound Action parses the watermark, sets
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   state = approved
+  </code>
+  on that user's
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   sysapproval_approver
+  </code>
+  record.
+ </li>
+</ol>
+<hr style="border: 0; border-top: 1px solid lightgray; margin: 24px 0;"/>
+<h2 style="font-size: 18px; font-weight: bold; border-bottom: 1px solid lightgray; padding-bottom: 6px; margin-top: 24px; margin-bottom: 12px; color: black;">
+ 5. Scheduled Weekly CAB Review Digest (Replaces Meeting Agenda)
+</h2>
+<p>
+ To give
+ <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+  &lt;CAB_APPROVAL_GROUP&gt;
+ </code>
+ a unified view of all upcoming changes without generating any meeting records, set up a scheduled digest flow.
+</p>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ Step 5.1: Create Scheduled Flow in Flow Designer
+</h3>
+<ol style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+ <li style="margin-bottom: 4px;">
+  Go to
+  <strong>
+   Flow Designer &gt; New Flow
+  </strong>
+  .
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Name
+  </strong>
+  :
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   CAB Weekly Asynchronous Review Digest
+  </code>
+  .
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Trigger
+  </strong>
+  :
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   Scheduled
+  </code>
+  -&gt;
+  <strong>
+   Weekly
+  </strong>
+  (e.g., Every Monday at 08:00 AM).
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Action 1: Look Up Records
+  </strong>
+  :
+ </li>
+ <li style="margin-bottom: 4px;">
+  Table:
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   Change Request [change_request]
+  </code>
+ </li>
+ <li style="margin-bottom: 4px;">
+  Conditions:
+  <ul style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+   <li style="margin-bottom: 4px;">
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     State = Authorize
+    </code>
+   </li>
+   <li style="margin-bottom: 4px;">
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     Type = Normal
+    </code>
+   </li>
+   <li style="margin-bottom: 4px;">
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     Planned start date between last week and next week
+    </code>
+   </li>
+  </ul>
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Action 2: Check If Records Found
+  </strong>
+  :
+ </li>
+ <li style="margin-bottom: 4px;">
+  If
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   Look Up Records -&gt; Count &gt; 0
+  </code>
+  :
+  <ul style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+   <li style="margin-bottom: 4px;">
+    Send Email:
+   </li>
+   <li style="margin-bottom: 4px;">
+    <strong>
+     To
+    </strong>
+    : Group
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     &lt;CAB_APPROVAL_GROUP&gt;
+    </code>
+   </li>
+   <li style="margin-bottom: 4px;">
+    <strong>
+     Subject
+    </strong>
+    :
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     Weekly CAB Asynchronous Review Packet - [Count] Pending Changes
+    </code>
+   </li>
+   <li style="margin-bottom: 4px;">
+    <strong>
+     Body
+    </strong>
+    : Table containing Change Number, Short Description, Assigned To, Risk, Planned Start Date, and direct link to each Change record.
+   </li>
+  </ul>
+ </li>
+ <li style="margin-bottom: 4px;">
+  If
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   Count == 0
+  </code>
+  :
+  <ul style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+   <li style="margin-bottom: 4px;">
+    (Optional) Send "No changes require CAB review this week" or do nothing.
+   </li>
+  </ul>
+ </li>
+</ol>
+<hr style="border: 0; border-top: 1px solid lightgray; margin: 24px 0;"/>
+<h2 style="font-size: 18px; font-weight: bold; border-bottom: 1px solid lightgray; padding-bottom: 6px; margin-top: 24px; margin-bottom: 12px; color: black;">
+ 6. Summary of Asynchronous Lifecycle
+</h2>
+<pre style="background-color: whitesmoke; border: 1px solid lightgray; border-radius: 4px; padding: 12px; overflow-x: auto; font-family: Consolas, Monaco, monospace; font-size: 13px; line-height: 1.45; margin: 14px 0;"><code style="font-family: Consolas, Monaco, monospace; color: black; background: transparent; padding: 0;">[Normal Change: Assess] 
+       │ (Risk evaluated, Planned Start Date set)
+       ▼
+[State moves to Authorize]
+       │
+       ├─► Meets Date Window? (last week to next week)
+       │         │
+       │         ├─► YES: Flow triggers CAB Approval
+       │         │        ├─► sysapproval_approver created for all members of &lt;CAB_APPROVAL_GROUP&gt;
+       │         │        ├─► Individual 1-click voting email dispatched to all members
+       │         │        └─► Included in next Scheduled Weekly CAB Digest
+       │         │
+       │         └─► NO: Held or routed according to out-of-cycle rules
+       │
+[Asynchronous Voting]
+       ├─► Every member replies via email ("Approve") or portal
+       │
+       ▼
+[Quorum Reached: ALL Members Approved]
+       │
+       ▼
+[State automatically moves to Scheduled]
+</code></pre>
+<p>
+ No CAB Definition meetings, no agenda item records, and no live workbench required!
+</p>
+
+
+</div>

@@ -1,0 +1,511 @@
+<!-- 
+  ServiceNow Knowledge Base Article: KB - Employee End Date Setup Guide
+  Category: Employee End Date Import
+  Instructions:
+  1. Open ServiceNow -> Knowledge -> Articles -> Create New (or open kb_knowledge form).
+  2. In the "Article Body" (text field) TinyMCE toolbar, click the Source Code icon (<>).
+  3. Paste this entire HTML block into the source window and click OK.
+  4. Fill in Short Description: "KB - Employee End Date Setup Guide"
+  5. Select Knowledge Base and Category: "Employee End Date Import"
+  6. Click Save or Publish.
+-->
+<div class="sn-kb-article" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 14px; line-height: 1.6; color: black; max-width: 100%;">
+  
+  <!-- KB Metadata Header Callout -->
+  <div class="alert alert-info" style="padding: 12px 16px; margin-bottom: 20px; border: 1px solid lightgray; border-left: 5px solid darkblue; border-radius: 4px; background-color: aliceblue; font-size: 13px;">
+    <div style="font-weight: bold; font-size: 15px; margin-bottom: 4px; color: darkblue;">Knowledge Base Article Details</div>
+    <div><strong>Title:</strong> KB - Employee End Date Setup Guide</div>
+    <div><strong>Category:</strong> Employee End Date Import</div>
+    <div><strong>Audience:</strong> ServiceNow Administrators, Change Managers, IT Operations</div>
+  </div>
+
+  <!-- Article Body Content -->
+<h1 style="font-size: 22px; font-weight: bold; border-bottom: 2px solid lightgray; padding-bottom: 8px; margin-top: 16px; margin-bottom: 16px; color: black;">
+ Employee End Date Import  -  Setup Guide (One-Time)
+</h1>
+<p>
+ This document covers the
+ <strong>
+  one-time setup
+ </strong>
+ for manually importing Employee End Dates into the Employee Profile table in ServiceNow. Once configured, you will use this process on an ad-hoc basis whenever end dates need to be bulk updated.
+</p>
+<hr style="border: 0; border-top: 1px solid lightgray; margin: 24px 0;"/>
+<h2 style="font-size: 18px; font-weight: bold; border-bottom: 1px solid lightgray; padding-bottom: 6px; margin-top: 24px; margin-bottom: 12px; color: black;">
+ Configuration Reference
+</h2>
+<table class="table table-bordered table-striped" style="width: 100%; border-collapse: collapse; margin: 16px 0; border: 1px solid lightgray; font-size: 13px;">
+ <thead>
+  <tr>
+   <th style="background-color: whitesmoke; border: 1px solid lightgray; padding: 8px 10px; text-align: left; font-weight: bold; color: black;">
+    Item
+   </th>
+   <th style="background-color: whitesmoke; border: 1px solid lightgray; padding: 8px 10px; text-align: left; font-weight: bold; color: black;">
+    Value
+   </th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Source Data
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    CSV with two columns: SAM Account Name, Employee End Date
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Target Table
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     sn_employee_profile
+    </code>
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Lookup Method
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    Dot-walk to
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     u_samaccountname
+    </code>
+    on the
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     sys_user
+    </code>
+    reference
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Execution
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    Manual / Ad-hoc
+   </td>
+  </tr>
+ </tbody>
+</table>
+<hr style="border: 0; border-top: 1px solid lightgray; margin: 24px 0;"/>
+<h2 style="font-size: 18px; font-weight: bold; border-bottom: 1px solid lightgray; padding-bottom: 6px; margin-top: 24px; margin-bottom: 12px; color: black;">
+ Step 1: Create the Staging Table &amp; Data Source
+</h2>
+<p>
+ Since this process runs manually, we will create a Data Source that you can easily attach a CSV to whenever needed.
+</p>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ 1.1  -  Create the Data Source
+</h3>
+<ol style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+ <li style="margin-bottom: 4px;">
+  Navigate to
+  <strong>
+   System Import Sets → Administration → Data Sources
+  </strong>
+  .
+ </li>
+ <li style="margin-bottom: 4px;">
+  Click
+  <strong>
+   New
+  </strong>
+  .
+ </li>
+ <li style="margin-bottom: 4px;">
+  Fill in:
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Name:
+  </strong>
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   Manual Employee End Date Import
+  </code>
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Import set table label:
+  </strong>
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   Employee End Date Import
+  </code>
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Import set table name:
+  </strong>
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   u_employee_end_date_import
+  </code>
+  (This will auto-populate and create a new staging table).
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Format:
+  </strong>
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   CSV
+  </code>
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Type:
+  </strong>
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   File
+  </code>
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   File retrieval method:
+  </strong>
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   Attachment
+  </code>
+ </li>
+ <li style="margin-bottom: 4px;">
+  Click
+  <strong>
+   Save
+  </strong>
+  (do not attach a file yet).
+ </li>
+</ol>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ 1.2  -  Define Staging Table Columns
+</h3>
+<p>
+ ServiceNow can auto-generate these when you load a file, but defining them manually ensures consistency.
+ <br/>
+ 1. Scroll down to the
+ <strong>
+  Columns
+ </strong>
+ related list on your new Data Source.
+ <br/>
+ 2. Click
+ <strong>
+  New
+ </strong>
+ and add the following two columns:
+ <br/>
+ -
+ <strong>
+  Column label:
+ </strong>
+ <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+  SAM Account Name
+ </code>
+ |
+ <strong>
+  Type:
+ </strong>
+ <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+  String
+ </code>
+ |
+ <strong>
+  Max length:
+ </strong>
+ <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+  100
+ </code>
+ <br/>
+ -
+ <strong>
+  Column label:
+ </strong>
+ <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+  End Date
+ </code>
+ |
+ <strong>
+  Type:
+ </strong>
+ <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+  String
+ </code>
+ (Leave as string for the staging table to handle various CSV date formats gracefully).
+</p>
+<h2 style="font-size: 18px; font-weight: bold; border-bottom: 1px solid lightgray; padding-bottom: 6px; margin-top: 24px; margin-bottom: 12px; color: black;">
+ Step 2: Create the Transform Map
+</h2>
+<p>
+ This map handles linking the CSV data to the correct profile using Dot-Walking.
+</p>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ 2.1  -  Create the Map
+</h3>
+<ol style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+ <li style="margin-bottom: 4px;">
+  Navigate to
+  <strong>
+   System Import Sets → Transform Maps
+  </strong>
+  .
+ </li>
+ <li style="margin-bottom: 4px;">
+  Click
+  <strong>
+   New
+  </strong>
+  .
+ </li>
+ <li style="margin-bottom: 4px;">
+  Fill in:
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Name:
+  </strong>
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   Employee End Date Transform
+  </code>
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Source table:
+  </strong>
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   Employee End Date Import [u_employee_end_date_import]
+  </code>
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Target table:
+  </strong>
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   Employee Profile [sn_employee_profile]
+  </code>
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Run business rules:
+  </strong>
+  Checked
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Active:
+  </strong>
+  Checked
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Save
+  </strong>
+  .
+ </li>
+</ol>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ 2.2  -  Add Field Mapping: User Lookup (Dot-Walking)
+</h3>
+<p>
+ Click
+ <strong>
+  New
+ </strong>
+ in the
+ <strong>
+  Field Maps
+ </strong>
+ related list:
+</p>
+<table class="table table-bordered table-striped" style="width: 100%; border-collapse: collapse; margin: 16px 0; border: 1px solid lightgray; font-size: 13px;">
+ <thead>
+  <tr>
+   <th style="background-color: whitesmoke; border: 1px solid lightgray; padding: 8px 10px; text-align: left; font-weight: bold; color: black;">
+    Setting
+   </th>
+   <th style="background-color: whitesmoke; border: 1px solid lightgray; padding: 8px 10px; text-align: left; font-weight: bold; color: black;">
+    Value
+   </th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Source field
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     u_sam_account_name
+    </code>
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Target field
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     user
+    </code>
+    (or the reference field to sys_user on the profile)
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Coalesce
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Yes
+    </strong>
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Reference value field name
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     u_samaccountname
+    </code>
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Choice action
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     reject
+    </code>
+    (Prevents creating new profiles for invalid users)
+   </td>
+  </tr>
+ </tbody>
+</table>
+<p>
+ <em>
+  Note: By setting the Reference value field name, ServiceNow will look up the user by their SAM Account Name instead of their Sys ID.
+ </em>
+ <br/>
+ <strong>
+  Save
+ </strong>
+ the field map.
+</p>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ 2.3  -  Add Field Mapping: End Date
+</h3>
+<p>
+ Click
+ <strong>
+  New
+ </strong>
+ in the
+ <strong>
+  Field Maps
+ </strong>
+ related list:
+</p>
+<table class="table table-bordered table-striped" style="width: 100%; border-collapse: collapse; margin: 16px 0; border: 1px solid lightgray; font-size: 13px;">
+ <thead>
+  <tr>
+   <th style="background-color: whitesmoke; border: 1px solid lightgray; padding: 8px 10px; text-align: left; font-weight: bold; color: black;">
+    Setting
+   </th>
+   <th style="background-color: whitesmoke; border: 1px solid lightgray; padding: 8px 10px; text-align: left; font-weight: bold; color: black;">
+    Value
+   </th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Source field
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     u_end_date
+    </code>
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Target field
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     employment_end_date
+    </code>
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Coalesce
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    No
+   </td>
+  </tr>
+  <tr>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    <strong>
+     Date format
+    </strong>
+   </td>
+   <td style="border: 1px solid lightgray; padding: 8px 10px; vertical-align: top; color: black;">
+    Select or enter the exact format used in your CSV (e.g.,
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     yyyy-MM-dd
+    </code>
+    or
+    <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+     MM/dd/yyyy
+    </code>
+    )
+   </td>
+  </tr>
+ </tbody>
+</table>
+<p>
+ <strong>
+  Save
+ </strong>
+ the field map.
+</p>
+<hr style="border: 0; border-top: 1px solid lightgray; margin: 24px 0;"/>
+<h2 style="font-size: 18px; font-weight: bold; border-bottom: 1px solid lightgray; padding-bottom: 6px; margin-top: 24px; margin-bottom: 12px; color: black;">
+ Setup Complete
+</h2>
+<p>
+ The architecture is now fully built. To actually run the import, refer to the
+ <strong>
+  Employee End Date Import  -  Operations Guide
+ </strong>
+ .
+</p>
+
+
+</div>

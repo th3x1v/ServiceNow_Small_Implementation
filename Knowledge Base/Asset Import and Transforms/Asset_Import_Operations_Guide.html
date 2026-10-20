@@ -1,0 +1,480 @@
+<!-- 
+  ServiceNow Knowledge Base Article: KB - Asset Import Operations Guide
+  Category: Asset Import and Transforms
+  Instructions:
+  1. Open ServiceNow -> Knowledge -> Articles -> Create New (or open kb_knowledge form).
+  2. In the "Article Body" (text field) TinyMCE toolbar, click the Source Code icon (<>).
+  3. Paste this entire HTML block into the source window and click OK.
+  4. Fill in Short Description: "KB - Asset Import Operations Guide"
+  5. Select Knowledge Base and Category: "Asset Import and Transforms"
+  6. Click Save or Publish.
+-->
+<div class="sn-kb-article" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 14px; line-height: 1.6; color: black; max-width: 100%;">
+  
+  <!-- KB Metadata Header Callout -->
+  <div class="alert alert-info" style="padding: 12px 16px; margin-bottom: 20px; border: 1px solid lightgray; border-left: 5px solid darkblue; border-radius: 4px; background-color: aliceblue; font-size: 13px;">
+    <div style="font-weight: bold; font-size: 15px; margin-bottom: 4px; color: darkblue;">Knowledge Base Article Details</div>
+    <div><strong>Title:</strong> KB - Asset Import Operations Guide</div>
+    <div><strong>Category:</strong> Asset Import and Transforms</div>
+    <div><strong>Audience:</strong> ServiceNow Administrators, Change Managers, IT Operations</div>
+  </div>
+
+  <!-- Article Body Content -->
+<h1 style="font-size: 22px; font-weight: bold; border-bottom: 2px solid lightgray; padding-bottom: 8px; margin-top: 16px; margin-bottom: 16px; color: black;">
+ Asset Import - Operations Guide
+</h1>
+<p>
+ This guide covers the ongoing "as-needed" manual process for importing batches of new hardware into ServiceNow.
+</p>
+<div class="alert alert-info" style="padding: 12px 16px; margin: 16px 0; border: 1px solid lightgray; border-left: 5px solid darkblue; border-radius: 4px; background-color: aliceblue; font-size: 13px;">
+ <strong style="color: darkblue;">
+  Note:
+ </strong>
+ <p>
+  We maintain assets by uploading CSV files manually as new groups of hardware are received. Because we use
+  <strong>
+   chained Transform Maps
+  </strong>
+  , if a CSV contains a brand new Manufacturer or Model that doesn't exist in the system yet, the pipeline will automatically create them for you on the fly.
+ </p>
+</div>
+<hr style="border: 0; border-top: 1px solid lightgray; margin: 24px 0;"/>
+<h2 style="font-size: 18px; font-weight: bold; border-bottom: 1px solid lightgray; padding-bottom: 6px; margin-top: 24px; margin-bottom: 12px; color: black;">
+ 1. Prepare the CSV File
+</h2>
+<p>
+ When a batch of new hardware arrives, collect their data in your standard CSV format template.
+</p>
+<p>
+ <strong>
+  Critical Requirements:
+ </strong>
+ <br/>
+ -
+ <strong>
+  Serial Number
+ </strong>
+ must be populated for every row. This is the coalesce field used to uniquely identify assets and avoid duplicates.
+ <br/>
+ - Ensure any reference fields (PO Number, Cost Center, Location, Department) match the spelling of existing records in the system.
+</p>
+<hr style="border: 0; border-top: 1px solid lightgray; margin: 24px 0;"/>
+<h2 style="font-size: 18px; font-weight: bold; border-bottom: 1px solid lightgray; padding-bottom: 6px; margin-top: 24px; margin-bottom: 12px; color: black;">
+ 2. Upload the Hardware Batch
+</h2>
+<p>
+ When you are ready to import the batch:
+</p>
+<ol style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+ <li style="margin-bottom: 4px;">
+  Navigate to
+  <strong>
+   System Import Sets &gt; Load Data
+  </strong>
+  .
+ </li>
+ <li style="margin-bottom: 4px;">
+  For
+  <strong>
+   Import set table
+  </strong>
+  , choose
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   Existing table
+  </code>
+  .
+ </li>
+ <li style="margin-bottom: 4px;">
+  Select the staging table set up during the one-time configuration (
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   u_asset_manual_import
+  </code>
+  ).
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Source of import
+  </strong>
+  : File
+ </li>
+ <li style="margin-bottom: 4px;">
+  Upload your prepared CSV.
+ </li>
+ <li style="margin-bottom: 4px;">
+  Click
+  <strong>
+   Submit
+  </strong>
+  .
+ </li>
+</ol>
+<hr style="border: 0; border-top: 1px solid lightgray; margin: 24px 0;"/>
+<h2 style="font-size: 18px; font-weight: bold; border-bottom: 1px solid lightgray; padding-bottom: 6px; margin-top: 24px; margin-bottom: 12px; color: black;">
+ 3. Run the Transform Pipeline
+</h2>
+<p>
+ You must run all three maps in the sequence to ensure reference data builds correctly before the asset is created.
+</p>
+<ol style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+ <li style="margin-bottom: 4px;">
+  Once the upload completes, click
+  <strong>
+   Run Transform
+  </strong>
+  on the confirmation screen (or navigate to
+  <strong>
+   System Import Sets &gt; Run Transform
+  </strong>
+  ).
+ </li>
+ <li style="margin-bottom: 4px;">
+  Select all three maps you created during setup:
+ </li>
+ <li style="margin-bottom: 4px;">
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   Asset 1 - Create Manufacturers
+  </code>
+ </li>
+ <li style="margin-bottom: 4px;">
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   Asset 2 - Create Models
+  </code>
+ </li>
+ <li style="margin-bottom: 4px;">
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   Asset 3 - Import Assets
+  </code>
+ </li>
+ <li style="margin-bottom: 4px;">
+  Click
+  <strong>
+   Transform
+  </strong>
+  .
+ </li>
+</ol>
+<hr style="border: 0; border-top: 1px solid lightgray; margin: 24px 0;"/>
+<h2 style="font-size: 18px; font-weight: bold; border-bottom: 1px solid lightgray; padding-bottom: 6px; margin-top: 24px; margin-bottom: 12px; color: black;">
+ 4. Review the Results
+</h2>
+<p>
+ Wait a few moments for the transform pipeline to execute.
+</p>
+<p>
+ You should see a summary such as:
+</p>
+<pre style="background-color: whitesmoke; border: 1px solid lightgray; border-radius: 4px; padding: 12px; overflow-x: auto; font-family: Consolas, Monaco, monospace; font-size: 13px; line-height: 1.45; margin: 14px 0;"><code style="font-family: Consolas, Monaco, monospace; color: black; background: transparent; padding: 0;">Inserts: [total rows in batch]
+Updates: 0
+Errors:  0
+</code></pre>
+<ul style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Inserts
+  </strong>
+  : The newly injected hardware rows, as well as any brand new Models or Manufacturers that were auto-created.
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Updates
+  </strong>
+  : If a Serial Number already existed in the system, the import will simply update the mapped fields instead of generating duplicates.
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Errors
+  </strong>
+  : Check the
+  <strong>
+   Import Set Rows -&gt; Error state
+  </strong>
+  if a row failed (commonly due to a blank Serial Number or a misspelled reference like Cost Center).
+ </li>
+</ul>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ Spot-Check Verification
+</h3>
+<p>
+ Ensure the import worked flawlessly:
+ <br/>
+ 1. Go to
+ <strong>
+  Asset &gt; Portfolios &gt; Hardware Assets
+ </strong>
+ (or All Assets).
+ <br/>
+ 2. Search for 2-3 newly added Serial Numbers.
+ <br/>
+ 3. Confirm that the imported data points populated their respective fields correctly (especially the Model, PO Number, and Cost Center).
+ <br/>
+ 4. Over time, as devices are plugged into the network, confirm that the MECM/SCCM Service Graph Connector continues to successfully relate the new CIs automatically.
+</p>
+<hr style="border: 0; border-top: 1px solid lightgray; margin: 24px 0;"/>
+<h2 style="font-size: 18px; font-weight: bold; border-bottom: 1px solid lightgray; padding-bottom: 6px; margin-top: 24px; margin-bottom: 12px; color: black;">
+ 5. Handling Rejected Imports (Missing Model Categories)
+</h2>
+<p>
+ Unlike Manufacturers and Models,
+ <strong>
+  Model Categories
+ </strong>
+ are explicitly configured to
+ <strong>
+  reject
+ </strong>
+ during the import if they do not exist. This is a safety mechanism to prevent broken CIs.
+</p>
+<p>
+ If your import errors out because it encountered a new hardware type (e.g., "TV" or "Projector"), you must manually create the Model Category before rerunning the import.
+</p>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ Scenario A: Standard Hardware (Needs a CI)
+</h3>
+<p>
+ If the new hardware is something that will connect to the network (e.g., a new type of Switch) and needs a CMDB record:
+ <br/>
+ 1. Navigate to
+ <strong>
+  Product Catalog &gt; Product Model &gt; Model Categories
+ </strong>
+ .
+ <br/>
+ 2. Click
+ <strong>
+  New
+ </strong>
+ .
+ <br/>
+ 3. Name: (e.g., "Switch")
+ <br/>
+ 4. CI Class:
+ <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+  cmdb_ci_netgear
+ </code>
+ (or the appropriate CMDB table).
+ <br/>
+ 5. Asset Class:
+ <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+  alm_hardware
+ </code>
+ .
+ <br/>
+ 6. Save and rerun the import.
+</p>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ Scenario B: Financial Assets Only (No CI - e.g., TVs, Furniture)
+</h3>
+<p>
+ If the new hardware is purely for financial/inventory tracking and you
+ <strong>
+  do not
+ </strong>
+ want it cluttering your CMDB:
+ <br/>
+ 1. Navigate to
+ <strong>
+  Product Catalog &gt; Product Model &gt; Model Categories
+ </strong>
+ .
+ <br/>
+ 2. Click
+ <strong>
+  New
+ </strong>
+ .
+ <br/>
+ 3. Name: (e.g., "TV" or "Desk")
+ <br/>
+ 4.
+ <strong>
+  CI Class
+ </strong>
+ :
+ <em>
+  -- Leave this completely blank! --
+ </em>
+ <br/>
+ 5. Asset Class:
+ <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+  alm_hardware
+ </code>
+ (or
+ <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+  alm_facility
+ </code>
+ ).
+ <br/>
+ 6. Save and rerun the import.
+</p>
+<p>
+ By leaving the CI Class blank, ServiceNow knows to only create the financial Asset record for this hardware type, keeping your CMDB clean.
+</p>
+<hr style="border: 0; border-top: 1px solid lightgray; margin: 24px 0;"/>
+<h2 style="font-size: 18px; font-weight: bold; border-bottom: 1px solid lightgray; padding-bottom: 6px; margin-top: 24px; margin-bottom: 12px; color: black;">
+ 6. Troubleshooting "Already an Asset with that Serial Number" Errors
+</h2>
+<p>
+ If your import set rows fail with an error stating
+ <strong>
+  "there is already an asset with that serial number"
+ </strong>
+ , it means the Transform Map is attempting to perform an
+ <strong>
+  Insert
+ </strong>
+ rather than an
+ <strong>
+  Update
+ </strong>
+ for a record that already exists.
+</p>
+<p>
+ Follow these steps to diagnose and fix the issue:
+</p>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ Step 1: Check for Class Mismatches (alm_asset.list)
+</h3>
+<p>
+ The transform map targets
+ <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+  alm_hardware
+ </code>
+ . If the existing asset with that serial number was created in a different table (e.g. Consumable
+ <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+  alm_consumable
+ </code>
+ , Software License, or parent
+ <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+  alm_asset
+ </code>
+ ), the coalesce lookup on the
+ <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+  alm_hardware
+ </code>
+ table will fail to find it.
+ <br/>
+ 1. In ServiceNow, navigate to the parent asset table:
+ <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+  alm_asset.list
+ </code>
+ (type this in the filter navigator and press Enter).
+ <br/>
+ 2. Search for the duplicate serial number.
+ <br/>
+ 3. Look at the
+ <strong>
+  Class
+ </strong>
+ column:
+ <br/>
+ *
+ <strong>
+  If the Class is "Hardware":
+ </strong>
+ Proceed to Step 2.
+ <br/>
+ *
+ <strong>
+  If the Class is anything else (e.g. Consumable):
+ </strong>
+ You cannot coalesce match it with
+ <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+  alm_hardware
+ </code>
+ . You must either delete the incorrect record (if created in error) or manage it under its correct table.
+</p>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ Step 2: Verify the Transform Map Coalesce Configuration
+</h3>
+<ol style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+ <li style="margin-bottom: 4px;">
+  Navigate to
+  <strong>
+   System Import Sets &gt; Transform Maps
+  </strong>
+  and open
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   Asset 3 - Import Assets
+  </code>
+  .
+ </li>
+ <li style="margin-bottom: 4px;">
+  Scroll to the
+  <strong>
+   Field Maps
+  </strong>
+  related list.
+ </li>
+ <li style="margin-bottom: 4px;">
+  Ensure
+  <strong>
+   only
+  </strong>
+  the
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   serial_number
+  </code>
+  field has
+  <strong>
+   Coalesce
+  </strong>
+  set to
+  <strong>
+   true
+  </strong>
+  . If any other field is also set to coalesce (like
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   asset_tag
+  </code>
+  ), the system will evaluate using
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   AND
+  </code>
+  logic, causing matches to fail if one field differs.
+ </li>
+</ol>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ Step 3: Check for Whitespace or Casing Differences
+</h3>
+<p>
+ While the transform guide configures a source script to automatically trim whitespace, very unusual CSV formats (e.g., hidden characters) might still bypass matching.
+ <br/>
+ 1. In your staging table (
+ <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+  u_asset_manual_import
+ </code>
+ ), open the row that failed.
+ <br/>
+ 2. Inspect the raw value of the serial number and compare it to the record in
+ <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+  alm_hardware
+ </code>
+ . Check for any trailing carriage returns or spaces.
+</p>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ Step 4: Resolve Unlinked Records (CIs Created Before Assets)
+</h3>
+<p>
+ If you imported the assets
+ <em>
+  after
+ </em>
+ the devices were already live on the network (meaning Discovery created the CIs first), they may not have automatically linked.
+ <br/>
+ *
+ <strong>
+  The Solution:
+ </strong>
+ Use
+ <strong>
+  Scenario B (Retroactive Asset-CI Linking)
+ </strong>
+ in
+ <a href="file:///e:/Scripting%20Files/ServiceNow/Asset%20Import%20and%20Transforms/Orphan_Asset_CI_Linking_Script.md">
+  Orphan_Asset_CI_Linking_Script.md
+ </a>
+ to retroactively bind all existing unlinked CIs to your new Asset records by serial number.
+</p>
+
+
+</div>

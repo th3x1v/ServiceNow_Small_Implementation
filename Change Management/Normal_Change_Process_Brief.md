@@ -51,9 +51,9 @@ flowchart TD
         Q --> R[7. Closed]
     end
 
-    classDef happyPath fill:#d4edda,stroke:#28a745,stroke-width:2px,color:#155724;
-    classDef exceptionPath fill:#fff3cd,stroke:#ffc107,stroke-width:2px,color:#856404;
-    classDef normalStage fill:#e2e3e5,stroke:#6c757d,stroke-width:1px,color:#383d41;
+    classDef happyPath fill:honeydew,stroke:darkgreen,stroke-width:2px,color:darkgreen;
+    classDef exceptionPath fill:lightyellow,stroke:darkgoldenrod,stroke-width:2px,color:darkgoldenrod;
+    classDef normalStage fill:whitesmoke,stroke:gray,stroke-width:1px,color:black;
 
     class I happyPath;
     class J,K,L,M,N exceptionPath;

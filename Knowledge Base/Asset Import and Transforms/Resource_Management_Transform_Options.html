@@ -1,0 +1,493 @@
+<!-- 
+  ServiceNow Knowledge Base Article: KB - Resource Management Transform Options
+  Category: Asset Import and Transforms
+  Instructions:
+  1. Open ServiceNow -> Knowledge -> Articles -> Create New (or open kb_knowledge form).
+  2. In the "Article Body" (text field) TinyMCE toolbar, click the Source Code icon (<>).
+  3. Paste this entire HTML block into the source window and click OK.
+  4. Fill in Short Description: "KB - Resource Management Transform Options"
+  5. Select Knowledge Base and Category: "Asset Import and Transforms"
+  6. Click Save or Publish.
+-->
+<div class="sn-kb-article" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 14px; line-height: 1.6; color: black; max-width: 100%;">
+  
+  <!-- KB Metadata Header Callout -->
+  <div class="alert alert-info" style="padding: 12px 16px; margin-bottom: 20px; border: 1px solid lightgray; border-left: 5px solid darkblue; border-radius: 4px; background-color: aliceblue; font-size: 13px;">
+    <div style="font-weight: bold; font-size: 15px; margin-bottom: 4px; color: darkblue;">Knowledge Base Article Details</div>
+    <div><strong>Title:</strong> KB - Resource Management Transform Options</div>
+    <div><strong>Category:</strong> Asset Import and Transforms</div>
+    <div><strong>Audience:</strong> ServiceNow Administrators, Change Managers, IT Operations</div>
+  </div>
+
+  <!-- Article Body Content -->
+<h1 style="font-size: 22px; font-weight: bold; border-bottom: 2px solid lightgray; padding-bottom: 8px; margin-top: 16px; margin-bottom: 16px; color: black;">
+ Resource Management Transform Guide
+</h1>
+<p>
+ This guide describes how to programmatically manage
+ <strong>
+  Work Schedules
+ </strong>
+ and
+ <strong>
+  Average Daily FTE Hours
+ </strong>
+ (Hours Per Person Day) when importing Resource Groups and members into ServiceNow.
+</p>
+<hr style="border: 0; border-top: 1px solid lightgray; margin: 24px 0;"/>
+<h2 style="font-size: 18px; font-weight: bold; border-bottom: 1px solid lightgray; padding-bottom: 6px; margin-top: 24px; margin-bottom: 12px; color: black;">
+ 1. Understanding the Resource Management Data Model
+</h2>
+<p>
+ In ServiceNow, Resource Management is built on core platform tables:
+ <br/>
+ *
+ <strong>
+  Resource Group
+ </strong>
+ : A standard group record in the
+ <strong>
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   sys_user_group
+  </code>
+ </strong>
+ table. To act as a Resource Group, it typically has the
+ <strong>
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   resource_user
+  </code>
+ </strong>
+ role associated with it, or its
+ <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+  type
+ </code>
+ field contains the "resource" type.
+ <br/>
+ *
+ <strong>
+  Resource
+ </strong>
+ : A standard user record in the
+ <strong>
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   sys_user
+  </code>
+ </strong>
+ table who belongs to a Resource Group.
+ <br/>
+ *
+ <strong>
+  Work Schedule
+ </strong>
+ : Defined in the
+ <strong>
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   cmn_schedule
+  </code>
+ </strong>
+ table (e.g., "8-5 weekdays"). The schedule determines the resource's
+ <strong>
+  actual capacity
+ </strong>
+ (working hours). The schedule is referenced in the
+ <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+  schedule
+ </code>
+ field on
+ <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+  sys_user
+ </code>
+ .
+ <br/>
+ *
+ <strong>
+  FTE Conversion Factor
+ </strong>
+ : The
+ <strong>
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   average_daily_fte
+  </code>
+ </strong>
+ field on
+ <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+  sys_user_group
+ </code>
+ and
+ <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+  sys_user
+ </code>
+ (or the global property
+ <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+  com.snc.resource_management.average_daily_fte
+ </code>
+ ) is used as a conversion multiplier to translate "FTE" or "Person Days" into planned hours (e.g., 1 FTE = 8 hours/day).
+</p>
+<hr style="border: 0; border-top: 1px solid lightgray; margin: 24px 0;"/>
+<h2 style="font-size: 18px; font-weight: bold; border-bottom: 1px solid lightgray; padding-bottom: 6px; margin-top: 24px; margin-bottom: 12px; color: black;">
+ 2. Resource Schedule Assignment
+</h2>
+<p>
+ To assign your standard work schedule to your imported users during the transform, you can choose between a
+ <strong>
+  No-Code Configuration
+ </strong>
+ (recommended) or a
+ <strong>
+  Scripted Assignment
+ </strong>
+ .
+</p>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ Option A: No-Code "Default Value" Field Map (Recommended)
+</h3>
+<p>
+ This is the standard out-of-the-box best practice in ServiceNow. It allows you to assign your standard working schedule to all imported resources without needing a schedule column in your source CSV.
+</p>
+<h4 style="font-size: 14px; font-weight: bold; margin-top: 14px; margin-bottom: 6px; color: black;">
+ How to configure it:
+</h4>
+<ol style="margin: 10px 0 10px 20px; padding: 0; line-height: 1.6;">
+ <li style="margin-bottom: 4px;">
+  Open your
+  <strong>
+   User (
+   <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+    sys_user
+   </code>
+   )
+  </strong>
+  Transform Map.
+ </li>
+ <li style="margin-bottom: 4px;">
+  In the
+  <strong>
+   Field Maps
+  </strong>
+  related list, click
+  <strong>
+   New
+  </strong>
+  .
+ </li>
+ <li style="margin-bottom: 4px;">
+  Configure the Field Map as follows:
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Source field
+  </strong>
+  : Select
+  <strong>
+   <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+    [None]
+   </code>
+  </strong>
+  (or
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   (none - use default value)
+  </code>
+  in the dropdown).
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Target field
+  </strong>
+  : Select
+  <strong>
+   <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+    schedule
+   </code>
+  </strong>
+  (Reference field pointing to
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   cmn_schedule
+  </code>
+  ).
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Referenced value field
+  </strong>
+  : Select
+  <strong>
+   <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+    name
+   </code>
+  </strong>
+  (tells the system to search by name).
+ </li>
+ <li style="margin-bottom: 4px;">
+  Check the
+  <strong>
+   <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+    Use default value
+   </code>
+  </strong>
+  checkbox.
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Default value
+  </strong>
+  : Enter the
+  <strong>
+   exact name
+  </strong>
+  of your standard schedule record as it appears in ServiceNow (e.g.,
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   8-5 weekdays
+  </code>
+  or
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   Standard Working Calendar
+  </code>
+  ).
+ </li>
+ <li style="margin-bottom: 4px;">
+  <strong>
+   Choice action
+  </strong>
+  : Set to
+  <strong>
+   <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+    reject
+   </code>
+  </strong>
+  (Acts as a safety warning; if you type the name wrong, it rejects the transform rather than creating a blank relationship).
+ </li>
+</ol>
+<p>
+ Every user record processed by the import will automatically have your standard working schedule assigned.
+</p>
+<hr style="border: 0; border-top: 1px solid lightgray; margin: 24px 0;"/>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ Option B: Scripted
+ <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+  onAfter
+ </code>
+ Transform Script (Group-based Assignment)
+</h3>
+<p>
+ If you only want to assign the standard schedule to a user
+ <strong>
+  specifically when they are added to a Resource Group
+ </strong>
+ (rather than applying it to every user in the CSV), you can use an
+ <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+  onAfter
+ </code>
+ script in your
+ <strong>
+  Group Member (
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   sys_user_grmember
+  </code>
+  )
+ </strong>
+ Transform Map.
+</p>
+<p>
+ Add this script to your Group Member map:
+</p>
+<pre style="background-color: whitesmoke; border: 1px solid lightgray; border-radius: 4px; padding: 12px; overflow-x: auto; font-family: Consolas, Monaco, monospace; font-size: 13px; line-height: 1.45; margin: 14px 0;"><code class="language-javascript" style="font-family: Consolas, Monaco, monospace; color: black; background: transparent; padding: 0;">(function runTransformScript(source, map, log, target /*undefined onStart*/ ) {
+
+    // 1. Get the group record and verify it is a Resource Group
+    var groupGr = new GlideRecord("sys_user_group");
+    if (groupGr.get(target.group)) {
+
+        var isResourceGroup = groupGr.type.toString().indexOf("resource") &gt; -1 || 
+                             groupGr.name.toString().indexOf("Resource") &gt; -1;
+
+        if (isResourceGroup) {
+
+            // 2. Locate your standard company working schedule
+            var scheduleName = "8-5 weekdays"; // REPLACE with the exact name of your cmn_schedule record
+            var scheduleGr = new GlideRecord("cmn_schedule");
+            if (scheduleGr.get("name", scheduleName)) {
+
+                // 3. Find the user record and update their schedule reference
+                var userGr = new GlideRecord("sys_user");
+                if (userGr.get(target.user)) {
+
+                    // Only update if the user does not already have a schedule assigned
+                    if (JSUtil.nil(userGr.schedule)) {
+                        userGr.schedule = scheduleGr.getUniqueValue();
+                        userGr.update();
+
+                        log.info("Programmatically assigned schedule '" + scheduleName + 
+                                 "' to resource user: " + userGr.user_name);
+                    }
+                }
+            } else {
+                log.warn("Resource schedule '" + scheduleName + "' was not found.");
+            }
+        }
+    }
+
+})(source, map, log, target);
+</code></pre>
+<hr style="border: 0; border-top: 1px solid lightgray; margin: 24px 0;"/>
+<h2 style="font-size: 18px; font-weight: bold; border-bottom: 1px solid lightgray; padding-bottom: 6px; margin-top: 24px; margin-bottom: 12px; color: black;">
+ 3. Managing Average Daily FTE Hours / Hours Per Person Day
+</h2>
+<p>
+ Servicenow uses these values to calculate planning hours. You can manage this at two levels:
+</p>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ Level A: The Global Property (System-Wide Default)
+</h3>
+<p>
+ If a resource or group does not have a specific FTE hours value defined on their record, ServiceNow uses the global system property.
+ <br/>
+ *
+ <strong>
+  Property Name
+ </strong>
+ :
+ <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+  com.snc.resource_management.average_daily_fte
+ </code>
+ <br/>
+ *
+ <strong>
+  Default Value
+ </strong>
+ :
+ <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+  8
+ </code>
+ (8 hours = 1.0 FTE or 1.0 Person-Day).
+ <br/>
+ *
+ <strong>
+  Setting it
+ </strong>
+ : Navigate to
+ <strong>
+  Project Administration &gt; Settings &gt; Properties  -  Resource
+ </strong>
+ (or type
+ <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+  sys_properties.list
+ </code>
+ in the navigator and filter for this property name) to set this globally.
+</p>
+<h3 style="font-size: 15px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; color: black;">
+ Level B: Programmatic Group / User Overrides
+</h3>
+<p>
+ If your resource groups have different workday lengths (e.g., standard teams work 8 hours, but shift teams or external contractors work 10 hours), you can override this directly on the Group (
+ <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+  sys_user_group
+ </code>
+ ) or User (
+ <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+  sys_user
+ </code>
+ ) records using the standard
+ <strong>
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   average_daily_fte
+  </code>
+ </strong>
+ column.
+</p>
+<h4 style="font-size: 14px; font-weight: bold; margin-top: 14px; margin-bottom: 6px; color: black;">
+ Method 1: Direct Field Mapping (Transform Map)
+</h4>
+<p>
+ In your
+ <strong>
+  Group (
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   sys_user_group
+  </code>
+  )
+ </strong>
+ or
+ <strong>
+  User (
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   sys_user
+  </code>
+  )
+ </strong>
+ Transform Map, you can map your CSV's "Average daily FTE hours" column directly to the standard column:
+ <br/>
+ *
+ <strong>
+  Source field
+ </strong>
+ :
+ <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+  [your CSV column, e.g. FTE Hours]
+ </code>
+ <br/>
+ *
+ <strong>
+  Target field
+ </strong>
+ :
+ <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+  average_daily_fte
+ </code>
+ (Decimal field)
+ <br/>
+ *
+ <strong>
+  Choice action
+ </strong>
+ :
+ <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+  create
+ </code>
+</p>
+<h4 style="font-size: 14px; font-weight: bold; margin-top: 14px; margin-bottom: 6px; color: black;">
+ Method 2: Scripted Defaulting (Transform Script)
+</h4>
+<p>
+ If you want to enforce a default average daily FTE hours value (e.g.,
+ <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+  8
+ </code>
+ hours) for all imported Resource Groups dynamically during the group import:
+</p>
+<p>
+ Add this
+ <strong>
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   onBefore
+  </code>
+ </strong>
+ script to your
+ <strong>
+  Group (
+  <code style="background-color: whitesmoke; border: 1px solid lightgray; padding: 2px 4px; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 90%; color: black;">
+   sys_user_group
+  </code>
+  )
+ </strong>
+ Transform Map:
+</p>
+<pre style="background-color: whitesmoke; border: 1px solid lightgray; border-radius: 4px; padding: 12px; overflow-x: auto; font-family: Consolas, Monaco, monospace; font-size: 13px; line-height: 1.45; margin: 14px 0;"><code class="language-javascript" style="font-family: Consolas, Monaco, monospace; color: black; background: transparent; padding: 0;">(function runTransformScript(source, map, log, target /*undefined onStart*/ ) {
+
+    // Ensure the group is flagged as a Resource Group by setting its type
+    // In ServiceNow, the 'type' field is a Glide List. We append 'resource' to it.
+    var resourceTypeSysId = "db800657c0a8016501d5c52c6f10c571"; // REPLACE with the sys_id of your 'resource' group type
+
+    var currentTypes = target.type.toString();
+    if (currentTypes.indexOf(resourceTypeSysId) === -1) {
+        target.type = currentTypes ? currentTypes + "," + resourceTypeSysId : resourceTypeSysId;
+    }
+
+    // Set the average daily FTE hours to 8 if it is empty/blank in the source CSV
+    if (JSUtil.nil(source.u_average_daily_fte)) {
+        target.average_daily_fte = 8.0; // Sets default conversion: 1 FTE = 8 hours
+    }
+
+})(source, map, log, target);
+</code></pre>
+
+
+</div>
